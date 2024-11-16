@@ -1,3 +1,4 @@
+import { useColorScheme } from "@/hooks/useColorScheme";
 import {
   DarkTheme,
   DefaultTheme,
@@ -9,8 +10,6 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { Text } from "react-native";
 import "../global.css";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -19,7 +18,12 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    KelsonBold: require("../assets/fonts/Kelson-Bold.otf"),
+    KelsonRegular: require("../assets/fonts/Kelson-Regular.otf"),
+    KelsonLight: require("../assets/fonts/Kelson-Light.otf"),
+    KelsonExtraBold: require("../assets/fonts/Kelson-ExtraBold.otf"),
+    KelsonExtraLight: require("../assets/fonts/Kelson-ExtraLight.otf"),
+    KelsomMedium: require("../assets/fonts/Kelson-Medium.otf"),
   });
 
   useEffect(() => {
@@ -34,11 +38,9 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
+      <Stack initialRouteName="(auth)" screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(auth)" />
       </Stack>
-      <Text className="text-xl"></Text>
       <StatusBar style="auto" />
     </ThemeProvider>
   );
