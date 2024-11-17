@@ -6,6 +6,7 @@ interface MainButtonProps {
   title?: string;
   containerClassName?: string;
   titleClassName?: string;
+  onPress?: (e: any) => void;
 }
 
 const MainButton = ({
@@ -13,9 +14,11 @@ const MainButton = ({
   title,
   containerClassName,
   titleClassName,
+  onPress,
 }: MainButtonProps) => {
   return (
     <TouchableOpacity
+      onPress={onPress}
       className={`bg-primary items-center justify-center py-4 rounded-2xl ${containerClassName}`}
     >
       {children || (
