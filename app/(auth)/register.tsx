@@ -1,10 +1,12 @@
 import AuthMainLayout from "@/components/auth/AuthMainLayout";
 import OAuthenticationMethods, {
   AuthMethod,
-} from "@/components/auth/OAuthenticationMethod";
+} from "@/components/auth/OAuthenticationMethods";
+import CircularIcon from "@/components/common/CircularIcon";
 import MainButton from "@/components/common/MainButton";
 import MainTextField from "@/components/common/MainTextField";
-import Assets from "@/constants/assets";
+import Assets from "@/constants/Assets";
+import { Entypo } from "@expo/vector-icons";
 import { router } from "expo-router";
 import LottieView from "lottie-react-native";
 import React from "react";
@@ -23,7 +25,19 @@ const RegisterScreen = () => {
       <Text className="text-xl font-KelsonMedium">
         Please enter your email to continue
       </Text>
-      <MainTextField label="Email" />
+      <MainTextField
+        label="Email"
+        keyboardType="email-address"
+        prefix={
+          <CircularIcon>
+            <Entypo name="email" size={24} color="#247cff" />
+          </CircularIcon>
+        }
+        onChangeText={(value) => {
+          console.log(value);
+          // TODO: Do something with the email
+        }}
+      />
       <MainButton
         title="Let go"
         onPress={(e) => {

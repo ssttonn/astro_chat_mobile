@@ -3,9 +3,9 @@ import React from "react";
 import LottieView from "lottie-react-native";
 import MainTextField from "../common/MainTextField";
 import MainButton from "../common/MainButton";
-import OAuthenticationMethods, { AuthMethod } from "./OAuthenticationMethod";
+import OAuthenticationMethods, { AuthMethod } from "./OAuthenticationMethods";
 import { router } from "expo-router";
-import Assets from "@/constants/assets";
+import Assets from "@/constants/Assets";
 
 interface RegisterWithEmailProps {
   onPress?: (e: any) => void;

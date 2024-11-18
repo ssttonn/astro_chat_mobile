@@ -1,11 +1,13 @@
 import React from "react";
 import AuthMainLayout from "@/components/auth/AuthMainLayout";
 import LottieView from "lottie-react-native";
-import Assets from "@/constants/assets";
+import Assets from "@/constants/Assets";
 import { Text } from "react-native";
 import MainTextField from "@/components/common/MainTextField";
 import MainButton from "@/components/common/MainButton";
 import { router } from "expo-router";
+import CircularIcon from "@/components/common/CircularIcon";
+import { AntDesign, Entypo } from "@expo/vector-icons";
 
 const SubmitRegisterInfoScreen = () => {
   return (
@@ -24,11 +26,35 @@ const SubmitRegisterInfoScreen = () => {
       <Text className="text-xl font-KelsonMedium">
         Please enter your details to complete the registration
       </Text>
-      <MainTextField label="Username" />
-      <MainTextField label="Password" />
-      <MainTextField label="Confirm Password" />
+      <MainTextField
+        label="Username"
+        keyboardType="default"
+        prefix={
+          <CircularIcon>
+            <AntDesign name="user" size={24} color="#247cff" />
+          </CircularIcon>
+        }
+      />
+      <MainTextField
+        label="Password"
+        keyboardType="default"
+        prefix={
+          <CircularIcon>
+            <Entypo name="lock" size={24} color="#247cff" />
+          </CircularIcon>
+        }
+      />
+      <MainTextField
+        label="Confirm Password"
+        keyboardType="default"
+        prefix={
+          <CircularIcon>
+            <Entypo name="lock" size={24} color="#247cff" />
+          </CircularIcon>
+        }
+      />
       <MainButton
-        title="Submit"
+        title="Create account now"
         onPress={() => {
           router.replace("/home");
         }}

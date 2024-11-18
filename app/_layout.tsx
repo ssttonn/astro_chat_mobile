@@ -1,22 +1,16 @@
-import { useColorScheme } from "@/hooks/useColorScheme";
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
+import Toast, { ErrorToast, SuccessToast } from "react-native-toast-message";
 import "../global.css";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     KelsonBold: require("../assets/fonts/Kelson-Bold.otf"),
     KelsonRegular: require("../assets/fonts/Kelson-Regular.otf"),
@@ -37,11 +31,58 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+    <>
       <Stack initialRouteName="(auth)" screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(auth)" />
       </Stack>
       <StatusBar style="auto" />
-    </ThemeProvider>
+      <Toast
+        position="bottom"
+        config={{
+          success: (props) => (
+            <SuccessToast
+              {...props}
+              style={{
+                borderRadius: 20,
+                borderLeftWidth: 0,
+                // borderLeftColor: "#68D391",
+                // borderColor: "#68D391",
+                // borderWidth: 2,
+              }}
+              text2Style={{
+                fontSize: 15,
+                fontFamily: "KelsonBold",
+                color: "#68D391",
+                textAlign: "center",
+              }}
+              text2NumberOfLines={10}
+            />
+          ),
+          /*
+            Overwrite 'error' type,
+            by modifying the existing `ErrorToast` component
+          */
+          error: (props) => (
+            <ErrorToast
+              {...props}
+              style={{
+                borderRadius: 20,
+                borderLeftWidth: 0,
+                // borderLeftColor: "#FC8181",
+                // borderColor: "#FC8181",
+                // borderWidth: 2,
+              }}
+              text2Style={{
+                fontSize: 15,
+                fontFamily: "KelsonBold",
+                color: "#FC8181",
+                textAlign: "center",
+              }}
+              text2NumberOfLines={10}
+            />
+          ),
+        }}
+      />
+    </>
   );
 }

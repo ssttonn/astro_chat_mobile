@@ -2,7 +2,7 @@ import { View, Text } from "react-native";
 import React from "react";
 import AuthMainLayout from "@/components/auth/AuthMainLayout";
 import LottieView from "lottie-react-native";
-import Assets from "@/constants/assets";
+import Assets from "@/constants/Assets";
 import { OtpInput } from "react-native-otp-entry";
 import { router } from "expo-router";
 

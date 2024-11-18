@@ -1,7 +1,7 @@
-import { View, Text, Image } from "react-native";
-import React, { useCallback } from "react";
+import Assets from "@/constants/Assets";
+import React, { memo, useCallback } from "react";
+import { Text, View } from "react-native";
 import MainButton from "../common/MainButton";
-import Assets from "@/constants/assets";
 
 export enum AuthMethod {
   Google,
@@ -17,6 +17,7 @@ const OAuthenticationMethods = ({
   methods,
   onPress,
 }: OAuthenticationMethodProps) => {
+  console.log("OAuthenticationMethods");
   const methodTitle = useCallback((method: AuthMethod) => {
     switch (method) {
       case AuthMethod.Google:
@@ -68,4 +69,4 @@ const OAuthenticationMethods = ({
   );
 };
 
-export default OAuthenticationMethods;
+export default memo(OAuthenticationMethods);

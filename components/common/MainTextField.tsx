@@ -1,26 +1,50 @@
+import React, { memo, useState } from "react";
 import { TextInput, TextInputProps, View } from "react-native";
-import React from "react";
-import { Entypo } from "@expo/vector-icons";
 
 interface MainTextFieldProps {
   label: string;
-  icon?: React.ReactNode;
+  containerClassName?: string;
+  inputClassName?: string;
+  prefix?: React.ReactNode;
+  suffix?:
+    | React.ReactNode
+    | ((
+        obscured: boolean,
+        setObscured: (obscured: boolean) => void,
+      ) => React.ReactNode);
 }
 
-const MainTextField = ({ label, icon }: MainTextFieldProps) => {
-  return (
-    <View className="flex flex-row gap-2 bg-whiteGrey-100 p-3 rounded-2xl w-full focus:border-primary focus:border-2">
-      <View className="bg-white rounded-full p-2">
-        {icon || <Entypo name={"email"} size={24} color="#247cff" />}
-      </View>
+const MainTextField = ({
+  label,
+  prefix,
+  suffix,
+  containerClassName,
+  inputClassName,
+  ...props
+}: MainTextFieldProps & TextInputProps) => {
+  const [isFocused, setIsFocused] = useState(false);
+  const [isTextObscured, setIsObscured] = useState(label === "Password");
 
+  return (
+    <View
+      className={`flex flex-row items-center gap-2 bg-whiteGrey-100 p-3 rounded-2xl w-full ${isFocused ? "border-2 border-primary" : "border-2 border-transparent"} ${containerClassName}`}
+    >
+      {prefix}
       <TextInput
-        className="flex-1"
+        className={`flex-1 font-KelsonRegular text-[15px] placeholder:self-center ${inputClassName}`}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        secureTextEntry={isTextObscured}
         placeholder={label}
-        placeholderTextColor="black"
+        placeholderTextColor="#757d90"
+        {...props}
       />
+
+      {typeof suffix === "function"
+        ? suffix(isTextObscured, setIsObscured)
+        : suffix}
     </View>
   );
 };
 
-export default MainTextField;
+export default memo(MainTextField);
