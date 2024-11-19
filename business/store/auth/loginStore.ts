@@ -1,4 +1,5 @@
 import AxiosClient from "@/business/data/services/axiosClient";
+import { APIRoutes } from "@/constants/APIRoutes";
 import axios from "axios";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
@@ -47,30 +48,20 @@ export const useLoginStore = create<LoginStore>()(
         set((state) => {
           state.status = LoginStatus.LOADING;
         });
-        const response = await AxiosClient.post("/auth/login", {
+        const responseData = await AxiosClient.post(APIRoutes.login, {
           email,
           password,
         });
 
         set((state) => {
           state.status = LoginStatus.IDLE;
-          state.token = response.data.data.accessToken;
-          state.refreshToken = response.data.data.refreshToken;
-          state.accessTokenExpiryDate =
-            response.data.data.accessTokenExpiryDate;
+          state.token = responseData.data.accessToken;
+          state.refreshToken = responseData.data.refreshToken;
+          state.accessTokenExpiryDate = responseData.data.accessTokenExpiryDate;
           state.refreshTokenExpiryDate =
-            response.data.data.refreshTokenExpiryDate;
+            responseData.data.refreshTokenExpiryDate;
         });
       } catch (error) {
-        console.error(error);
-        if (axios.isAxiosError(error)) {
-          set((state) => {
-            state.status = LoginStatus.IDLE;
-            state.errorMessage = error.response?.data.data.message;
-          });
-          return;
-        }
-
         set((state) => {
           state.status = LoginStatus.IDLE;
           state.errorMessage = error as string | undefined;

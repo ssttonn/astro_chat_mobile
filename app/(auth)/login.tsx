@@ -48,23 +48,6 @@ const LoginScreen = () => {
   }, [email, password, onLogin]);
 
   useEffect(() => {
-    switch (status) {
-      case LoginStatus.SUCCESS:
-        Toast.show({
-          type: "success",
-          text2: "Login successful",
-        });
-        break;
-      case LoginStatus.ERROR:
-        Toast.show({
-          type: "error",
-          text2: errorMessage,
-        });
-        break;
-    }
-  }, [status, errorMessage, setFieldValue]);
-
-  useEffect(() => {
     if (
       token &&
       refreshToken &&
@@ -179,7 +162,10 @@ const LoginScreen = () => {
         <Text className="text-center text-black font-KelsonBold">
           Don't have an account?
         </Text>
-        <Link href={"/register"} className="text-primary font-KelsonBold">
+        <Link
+          href={"/(auth)/(register)/register"}
+          className="text-primary font-KelsonBold"
+        >
           Register
         </Link>
       </View>

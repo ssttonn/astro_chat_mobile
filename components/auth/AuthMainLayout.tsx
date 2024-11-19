@@ -1,7 +1,6 @@
-import React from "react";
+import React, { memo } from "react";
 import {
   Keyboard,
-  KeyboardAvoidingView,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
@@ -34,4 +33,4 @@ const AuthMainLayout = ({ children, onBackPress }: AuthMainLayoutProps) => {
   );
 };
 
-export default AuthMainLayout;
+export default memo(AuthMainLayout);

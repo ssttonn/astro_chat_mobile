@@ -4,6 +4,7 @@ import verifyOTPAnimation from "../assets/animations/verify-otp.json";
 import submitInfoAnimation from "../assets/animations/submit-info.json";
 import forgotPasswordAnimation from "../assets/animations/forgot-password.json";
 import splashAnimation from "../assets/animations/splash.json";
+import loadingAnimation from "../assets/animations/loading.json";
 
 import googleIcon from "../assets/icons/google.svg";
 import facebookIcon from "../assets/icons/facebook.svg";
@@ -15,6 +16,7 @@ const animations = {
   submitInfo: submitInfoAnimation,
   forgotPassword: forgotPasswordAnimation,
   splash: splashAnimation,
+  loading: loadingAnimation,
 };
 
 const icons = {

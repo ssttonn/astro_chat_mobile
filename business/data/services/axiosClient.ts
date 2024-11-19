@@ -4,28 +4,32 @@ axios.defaults.baseURL = process.env.EXPO_PUBLIC_API_URL;
 
 axios.interceptors.request.use(
   (request) => {
-    console.log(request);
     // Edit request config
     return request;
   },
   (error) => {
-    console.log(error);
-    return Promise.reject(error);
+    if (axios.isAxiosError(error)) {
+      return error.response?.data.data.message;
+    } else {
+      return "An error occurred";
+    }
   },
 );
 
 axios.interceptors.response.use(
   (response) => {
-    console.log(response);
     // Edit response config
-    return response;
+    return response.data;
   },
   (error) => {
-    console.log(error);
-    return Promise.reject(error);
+    return Promise.reject(
+      axios.isAxiosError(error)
+        ? error.response?.data.data.message
+        : "An error occurred",
+    );
   },
 );
 
-const AxiosClient = axios.create();
+const AxiosClient = axios;
 
 export default AxiosClient;
