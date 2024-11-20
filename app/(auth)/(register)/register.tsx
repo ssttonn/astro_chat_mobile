@@ -1,7 +1,7 @@
 import {
   RegisterStatus,
   useRegisterStore,
-} from "@/business/store/auth/registerStore";
+} from "@/business/store/auth/register/registerStore";
 import AuthMainLayout from "@/components/auth/AuthMainLayout";
 import OAuthenticationMethods, {
   AuthMethod,
@@ -15,15 +15,22 @@ import useValidators from "@/hooks/useValidators";
 import { Entypo } from "@expo/vector-icons";
 import { router } from "expo-router";
 import LottieView from "lottie-react-native";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import * as SecureStore from "expo-secure-store";
+import DBKey from "@/constants/DBKey";
+import ScreenRoutes from "@/constants/ScreenRoutes";
+import Toast from "react-native-toast-message";
+import useRegister from "@/hooks/useRegister";
 
 const RegisterScreen = () => {
   const {
     form: { email },
+    errorMessage,
+    setErrorMessage,
     setFormField,
-    status,
     onRegister,
+    reset,
   } = useRegisterStore();
 
   const { emailValidator } = useValidators();
@@ -31,6 +38,27 @@ const RegisterScreen = () => {
   const isButtonEnabled = useMemo(() => {
     return !emailValidator(email);
   }, [email, emailValidator]);
+
+  const onRegisterClicked = useCallback(
+    async (e: any) => {
+      let result = await onRegister(email);
+      if (!result) {
+        return;
+      }
+
+      let { otpToken, otpExpires } = result;
+
+      await Promise.all([
+        SecureStore.setItemAsync(DBKey.REGISTER_TOKEN, otpToken),
+        SecureStore.setItemAsync(DBKey.REGISTER_TOKEN_EXPIRY_DATE, otpExpires),
+      ]);
+
+      router.push(ScreenRoutes.verifyRegisterOtp);
+    },
+    [email, onRegister],
+  );
+
+  useRegister(errorMessage, setErrorMessage, reset);
 
   return (
     <>
@@ -66,12 +94,7 @@ const RegisterScreen = () => {
           title="Let go"
           isButtonEnabled={isButtonEnabled}
           containerClassName={isButtonEnabled ? "bg-primary" : "bg-gray-300"}
-          onPress={useCallback(
-            (e: any) => {
-              onRegister(email);
-            },
-            [email, onRegister],
-          )}
+          onPress={onRegisterClicked}
         />
         <OAuthenticationMethods
           methods={[AuthMethod.Google, AuthMethod.Facebook]}

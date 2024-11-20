@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import AuthMainLayout from "@/components/auth/AuthMainLayout";
 import LottieView from "lottie-react-native";
 import Assets from "@/constants/Assets";
@@ -9,29 +9,30 @@ import { router } from "expo-router";
 import CircularIcon from "@/components/common/CircularIcon";
 import { AntDesign, Entypo } from "@expo/vector-icons";
 import LoadingView from "@/components/common/LoadingView";
-import {
-  RegisterStatus,
-  RegisterStep,
-  useRegisterStore,
-} from "@/business/store/auth/registerStore";
+import { useSubmitUserInfoStore } from "@/business/store/auth/register/submitUserInfoStore";
+import { RegisterStatus } from "@/business/store/auth/register/registerStore";
+import useRegister from "@/hooks/useRegister";
 
 const SubmitRegisterInfoScreen = () => {
   const {
-    form: { username, password, email, confirmPassword },
+    form: { username, password, confirmPassword },
     status,
     setFormField,
     onSubmitUserInfo,
-    setStep,
-  } = useRegisterStore();
+    errorMessage,
+    setError,
+    reset,
+  } = useSubmitUserInfoStore();
+
+  useRegister(errorMessage, setError, reset);
 
   return (
     <>
       <LoadingView isLoading={status === RegisterStatus.LOADING} />
       <AuthMainLayout
         onBackPress={useCallback(() => {
-          setStep(RegisterStep.registerEmail);
           router.back();
-        }, [setStep])}
+        }, [])}
       >
         <LottieView
           style={{ width: "100%", aspectRatio: 1.1, alignSelf: "center" }}
@@ -94,7 +95,15 @@ const SubmitRegisterInfoScreen = () => {
         <MainButton
           title="Create account now"
           onPress={() => {
-            router.replace("/home");
+            // if (!token) return;
+            // onSubmitUserInfo(
+            //   {
+            //     username,
+            //     password,
+            //   },
+            //   token,
+            // );
+            // TODO: Handle user clicked on create account
           }}
         />
       </AuthMainLayout>

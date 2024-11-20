@@ -1,44 +1,90 @@
 import { View, Text, TouchableOpacity } from "react-native";
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useRef } from "react";
 import AuthMainLayout from "@/components/auth/AuthMainLayout";
 import LottieView from "lottie-react-native";
 import Assets from "@/constants/Assets";
 import { OtpInput } from "react-native-otp-entry";
 import { router } from "expo-router";
+
+import LoadingView from "@/components/common/LoadingView";
+import { useVerifyRegisterOtpStore } from "@/business/store/auth/register/verifyRegisterOtpStore";
+import useRegister from "@/hooks/useRegister";
 import {
   RegisterStatus,
-  RegisterStep,
   useRegisterStore,
-} from "@/business/store/auth/registerStore";
-import LoadingView from "@/components/common/LoadingView";
+} from "@/business/store/auth/register/registerStore";
+
+import * as SecureStore from "expo-secure-store";
+import DBKey from "@/constants/DBKey";
+import ScreenRoutes from "@/constants/ScreenRoutes";
+import useRegisterToken from "@/hooks/useRegisterToken";
 
 const VerifyRegisterOTPScreen = () => {
+  const { status, errorMessage, setError, reset, onVerifyOTP, onResendOTP } =
+    useVerifyRegisterOtpStore();
+
   const {
     form: { email },
-    token,
-    onVerifyOTP,
-    onResendOTP,
-    status,
-    step,
-    setStep,
   } = useRegisterStore();
 
   const otpInputRef = useRef<any>(null);
 
-  useEffect(() => {
-    if (step === RegisterStep.submitUserInfo) {
-      router.replace("/submit-register-info");
+  useRegister(errorMessage, setError, reset);
+
+  const { getRegisterToken } = useRegisterToken();
+
+  const onOTPFilled = useCallback(
+    async (code: string) => {
+      otpInputRef.current?.clear();
+      try {
+        let registerToken = await getRegisterToken();
+
+        let result = await onVerifyOTP(code, registerToken, email);
+
+        if (!result) {
+          setError("Something went wrong. Please try again.");
+          return;
+        }
+
+        // const { otpToken, otpExpires } = result;
+
+        // TODO: Handle OTP token and expiry date
+
+        router.push(ScreenRoutes.submitRegisterInfo);
+      } catch (error) {
+        if (typeof error === "string") {
+          setError(error || "Something went wrong. Please try again.");
+          return;
+        }
+        setError("Something went wrong. Please try again.");
+      }
+    },
+    [email, onVerifyOTP, setError, getRegisterToken],
+  );
+
+  const onResendOTPClicked = useCallback(async () => {
+    otpInputRef.current?.clear();
+
+    try {
+      let registerToken = await getRegisterToken();
+
+      let result = await onResendOTP(registerToken, email);
+    } catch (error) {
+      if (typeof error === "string") {
+        setError(error || "Something went wrong. Please try again.");
+        return;
+      }
+      setError("Something went wrong. Please try again.");
     }
-  }, [step]);
+  }, [getRegisterToken]);
 
   return (
     <>
       <LoadingView isLoading={status === RegisterStatus.LOADING} />
       <AuthMainLayout
         onBackPress={useCallback(() => {
-          setStep(RegisterStep.registerEmail);
           router.back();
-        }, [setStep])}
+        }, [])}
       >
         <LottieView
           style={{ width: "100%", aspectRatio: 1.2, alignSelf: "center" }}
@@ -55,10 +101,7 @@ const VerifyRegisterOTPScreen = () => {
           textInputProps={{
             accessibilityLabel: "One-Time Password",
           }}
-          onFilled={(code) => {
-            otpInputRef.current?.clear();
-            if (token) onVerifyOTP(code, token, email);
-          }}
+          onFilled={onOTPFilled}
           theme={{
             filledPinCodeContainerStyle: {
               backgroundColor: "#f5f6f7",
@@ -81,13 +124,7 @@ const VerifyRegisterOTPScreen = () => {
           <Text className="text-center text-black font-KelsonBold">
             Didn't receive the OTP?
           </Text>
-          <TouchableOpacity
-            onPress={() => {
-              otpInputRef.current?.clear();
-              if (!token) return;
-              onResendOTP(email, token);
-            }}
-          >
+          <TouchableOpacity onPress={onResendOTPClicked}>
             <Text className="text-primary font-KelsonBold">Resend OTP</Text>
           </TouchableOpacity>
         </View>
