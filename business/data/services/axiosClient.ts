@@ -8,11 +8,7 @@ axios.interceptors.request.use(
     return request;
   },
   (error) => {
-    if (axios.isAxiosError(error)) {
-      return error.response?.data.data.message;
-    } else {
-      return "An error occurred";
-    }
+    return Promise.reject(error);
   },
 );
 
@@ -22,6 +18,7 @@ axios.interceptors.response.use(
     return response.data;
   },
   (error) => {
+    console.log("abc: ", error.response?.data.data.message);
     return Promise.reject(
       axios.isAxiosError(error)
         ? error.response?.data.data.message

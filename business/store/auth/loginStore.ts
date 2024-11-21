@@ -16,13 +16,17 @@ interface LoginStore {
   };
   errorMessage?: string;
   status: LoginStatus;
-  token?: string;
-  refreshToken?: string;
-  accessTokenExpiryDate?: string;
-  refreshTokenExpiryDate?: string;
-  setFieldValue: (key: string, value: string) => void;
+  setError: (error: string | undefined) => void;
   setFormField: (key: string, value: string) => void;
-  onLogin: (email: string, password: string) => void;
+  onLogin: (
+    email: string,
+    password: string,
+  ) => Promise<{
+    accessToken: string;
+    refreshToken: string;
+    accessTokenExpiryDate: string;
+    refreshTokenExpiryDate: string;
+  }>;
   reset: () => void;
 }
 
@@ -33,9 +37,9 @@ export const useLoginStore = create<LoginStore>()(
       password: "",
     },
     status: LoginStatus.IDLE,
-    setFieldValue: (key, value) => {
+    setError: (error) => {
       set((state) => {
-        (state.form as any)[key] = value;
+        state.errorMessage = error;
       });
     },
     setFormField: (key, value) => {
@@ -55,17 +59,16 @@ export const useLoginStore = create<LoginStore>()(
 
         set((state) => {
           state.status = LoginStatus.IDLE;
-          state.token = responseData.data.accessToken;
-          state.refreshToken = responseData.data.refreshToken;
-          state.accessTokenExpiryDate = responseData.data.accessTokenExpiryDate;
-          state.refreshTokenExpiryDate =
-            responseData.data.refreshTokenExpiryDate;
         });
+
+        return responseData.data;
       } catch (error) {
         set((state) => {
           state.status = LoginStatus.IDLE;
           state.errorMessage = error as string | undefined;
         });
+
+        throw error;
       }
     },
     reset: () => {
@@ -74,10 +77,6 @@ export const useLoginStore = create<LoginStore>()(
         state.form.password = "";
         state.status = LoginStatus.IDLE;
         state.errorMessage = undefined;
-        state.token = undefined;
-        state.refreshToken = undefined;
-        state.accessTokenExpiryDate = undefined;
-        state.refreshTokenExpiryDate = undefined;
       });
     },
   })),

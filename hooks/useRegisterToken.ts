@@ -20,7 +20,20 @@ const useRegisterToken = () => {
     return registerToken;
   }, []);
 
-  return { getRegisterToken };
+  const saveRegisterToken = useCallback(
+    async (registerToken: string, registerTokenExpiryDate: string) => {
+      await Promise.all([
+        SecureStore.setItemAsync(DBKey.REGISTER_TOKEN, registerToken),
+        SecureStore.setItemAsync(
+          DBKey.REGISTER_TOKEN_EXPIRY_DATE,
+          registerTokenExpiryDate,
+        ),
+      ]);
+    },
+    [],
+  );
+
+  return { getRegisterToken, saveRegisterToken };
 };
 
 export default useRegisterToken;

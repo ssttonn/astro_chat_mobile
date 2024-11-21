@@ -3,6 +3,7 @@ import CircularIcon from "@/components/common/CircularIcon";
 import MainButton from "@/components/common/MainButton";
 import MainTextField from "@/components/common/MainTextField";
 import Assets from "@/constants/Assets";
+import ScreenRoutes from "@/constants/ScreenRoutes";
 import { Entypo } from "@expo/vector-icons";
 import { router } from "expo-router";
 import LottieView from "lottie-react-native";
@@ -26,6 +27,7 @@ const ForgotPasswordScreen = () => {
       </Text>
       <MainTextField
         label="Email"
+        type="email"
         keyboardType="email-address"
         prefix={
           <CircularIcon>
@@ -40,7 +42,7 @@ const ForgotPasswordScreen = () => {
       <MainButton
         title="Reset Password"
         onPress={(e) => {
-          router.push("/reset-password");
+          router.push(ScreenRoutes.resetPassword);
         }}
       />
     </AuthMainLayout>

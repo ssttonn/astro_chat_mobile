@@ -21,7 +21,7 @@ interface SubmitUserInfoState {
     | {
         accessToken: string;
         refreshToken: string;
-        accessTokenExiryDate: string;
+        accessTokenExpiryDate: string;
         refreshTokenExpiryDate: string;
       }
     | undefined
@@ -55,7 +55,7 @@ export const useSubmitUserInfoStore = create<SubmitUserInfoState>()(
         | {
             accessToken: string;
             refreshToken: string;
-            accessTokenExiryDate: string;
+            accessTokenExpiryDate: string;
             refreshTokenExpiryDate: string;
           }
         | undefined

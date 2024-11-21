@@ -14,10 +14,9 @@ import {
   useRegisterStore,
 } from "@/business/store/auth/register/registerStore";
 
-import * as SecureStore from "expo-secure-store";
-import DBKey from "@/constants/DBKey";
 import ScreenRoutes from "@/constants/ScreenRoutes";
 import useRegisterToken from "@/hooks/useRegisterToken";
+import Toast from "react-native-toast-message";
 
 const VerifyRegisterOTPScreen = () => {
   const { status, errorMessage, setError, reset, onVerifyOTP, onResendOTP } =
@@ -31,52 +30,58 @@ const VerifyRegisterOTPScreen = () => {
 
   useRegister(errorMessage, setError, reset);
 
-  const { getRegisterToken } = useRegisterToken();
+  const { getRegisterToken, saveRegisterToken } = useRegisterToken();
 
   const onOTPFilled = useCallback(
     async (code: string) => {
-      otpInputRef.current?.clear();
       try {
+        otpInputRef.current?.clear();
         let registerToken = await getRegisterToken();
 
         let result = await onVerifyOTP(code, registerToken, email);
 
         if (!result) {
-          setError("Something went wrong. Please try again.");
           return;
         }
 
-        // const { otpToken, otpExpires } = result;
+        const { submitInfoToken, submitInfoExpires } = result;
 
-        // TODO: Handle OTP token and expiry date
+        await saveRegisterToken(submitInfoToken, submitInfoExpires);
 
-        router.push(ScreenRoutes.submitRegisterInfo);
+        Toast.show({
+          type: "success",
+          text2: "OTP has been verified",
+        });
+
+        router.replace(ScreenRoutes.submitRegisterInfo);
       } catch (error) {
-        if (typeof error === "string") {
-          setError(error || "Something went wrong. Please try again.");
-          return;
-        }
-        setError("Something went wrong. Please try again.");
+        setError(error as string | undefined);
       }
     },
-    [email, onVerifyOTP, setError, getRegisterToken],
+    [email, onVerifyOTP, getRegisterToken, saveRegisterToken, setError],
   );
 
   const onResendOTPClicked = useCallback(async () => {
     otpInputRef.current?.clear();
+    let registerToken = await getRegisterToken();
 
-    try {
-      let registerToken = await getRegisterToken();
+    let result = await onResendOTP(email, registerToken);
 
-      let result = await onResendOTP(registerToken, email);
-    } catch (error) {
-      if (typeof error === "string") {
-        setError(error || "Something went wrong. Please try again.");
-        return;
-      }
-      setError("Something went wrong. Please try again.");
+    if (!result) {
+      return;
     }
-  }, [getRegisterToken]);
+
+    const { otpToken, otpExpires } = result;
+
+    await saveRegisterToken(otpToken, otpExpires);
+
+    otpInputRef.current?.focus();
+
+    Toast.show({
+      type: "success",
+      text2: "OTP has been sent to your email",
+    });
+  }, [getRegisterToken, saveRegisterToken, onResendOTP, email]);
 
   return (
     <>

@@ -1,12 +1,12 @@
+import { MaterialIcons } from "@expo/vector-icons";
 import React, { memo } from "react";
 import {
-  Keyboard,
+  KeyboardAvoidingView,
+  ScrollView,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { MaterialIcons } from "@expo/vector-icons";
 
 interface AuthMainLayoutProps {
   children?: React.ReactNode;
@@ -16,19 +16,31 @@ interface AuthMainLayoutProps {
 const AuthMainLayout = ({ children, onBackPress }: AuthMainLayoutProps) => {
   return (
     <SafeAreaView className="bg-white flex-1">
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View className="flex flex-1 h-[80vh] justify-center items-stretch w-[85%] self-center gap-2">
-          {onBackPress && (
-            <TouchableOpacity
-              onPress={onBackPress}
-              className="absolute left-0 top-0"
-            >
-              <MaterialIcons name="arrow-back-ios" size={30} color="#247cff" />
-            </TouchableOpacity>
-          )}
-          {children}
-        </View>
-      </TouchableWithoutFeedback>
+      <View className="flex-1 flex">
+        <KeyboardAvoidingView
+          className="flex-1 justify-center"
+          enabled
+          behavior="position"
+        >
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            className="h-full"
+            showsVerticalScrollIndicator={false}
+            alwaysBounceVertical={false}
+            contentContainerClassName="w-[85%] sm:w-[70%] self-center grow gap-y-2 justify-center"
+          >
+            {children}
+          </ScrollView>
+        </KeyboardAvoidingView>
+        {onBackPress && (
+          <TouchableOpacity
+            onPress={onBackPress}
+            className="absolute left-[28px] w-40 h-40"
+          >
+            <MaterialIcons name="arrow-back-ios" size={30} color="#247cff" />
+          </TouchableOpacity>
+        )}
+      </View>
     </SafeAreaView>
   );
 };

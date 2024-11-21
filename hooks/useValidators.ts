@@ -19,6 +19,15 @@ const useValidators = () => {
     return undefined;
   }, []);
 
+  const confirmPasswordValidator = useCallback(
+    (password: string, confirmPassword: string) => {
+      if (password !== confirmPassword) return "Passwords do not match";
+
+      return undefined;
+    },
+    [],
+  );
+
   const fieldValidator = useCallback((field: string, value: string) => {
     if (!value) return `${field} is required`;
 
@@ -28,6 +37,7 @@ const useValidators = () => {
   return {
     emailValidator,
     passwordValidator,
+    confirmPasswordValidator,
     fieldValidator,
   };
 };

@@ -11,21 +11,20 @@ import LoadingView from "@/components/common/LoadingView";
 import MainButton from "@/components/common/MainButton";
 import MainTextField from "@/components/common/MainTextField";
 import Assets from "@/constants/Assets";
+import ScreenRoutes from "@/constants/ScreenRoutes";
+import useRegister from "@/hooks/useRegister";
+import useRegisterToken from "@/hooks/useRegisterToken";
 import useValidators from "@/hooks/useValidators";
 import { Entypo } from "@expo/vector-icons";
 import { router } from "expo-router";
 import LottieView from "lottie-react-native";
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import * as SecureStore from "expo-secure-store";
-import DBKey from "@/constants/DBKey";
-import ScreenRoutes from "@/constants/ScreenRoutes";
-import Toast from "react-native-toast-message";
-import useRegister from "@/hooks/useRegister";
 
 const RegisterScreen = () => {
   const {
     form: { email },
+    status,
     errorMessage,
     setErrorMessage,
     setFormField,
@@ -34,6 +33,8 @@ const RegisterScreen = () => {
   } = useRegisterStore();
 
   const { emailValidator } = useValidators();
+
+  const { saveRegisterToken } = useRegisterToken();
 
   const isButtonEnabled = useMemo(() => {
     return !emailValidator(email);
@@ -48,14 +49,11 @@ const RegisterScreen = () => {
 
       let { otpToken, otpExpires } = result;
 
-      await Promise.all([
-        SecureStore.setItemAsync(DBKey.REGISTER_TOKEN, otpToken),
-        SecureStore.setItemAsync(DBKey.REGISTER_TOKEN_EXPIRY_DATE, otpExpires),
-      ]);
+      await saveRegisterToken(otpToken, otpExpires);
 
       router.push(ScreenRoutes.verifyRegisterOtp);
     },
-    [email, onRegister],
+    [email, onRegister, saveRegisterToken],
   );
 
   useRegister(errorMessage, setErrorMessage, reset);
@@ -76,6 +74,7 @@ const RegisterScreen = () => {
         </Text>
         <MainTextField
           label="Email"
+          type="email"
           keyboardType="email-address"
           value={email}
           prefix={
@@ -93,7 +92,6 @@ const RegisterScreen = () => {
         <MainButton
           title="Let go"
           isButtonEnabled={isButtonEnabled}
-          containerClassName={isButtonEnabled ? "bg-primary" : "bg-gray-300"}
           onPress={onRegisterClicked}
         />
         <OAuthenticationMethods
