@@ -1,12 +1,14 @@
-import { Entypo, Feather, FontAwesome } from "@expo/vector-icons";
-import { Href, router, Stack, Tabs } from "expo-router";
-import React, { useMemo, useRef, useState } from "react";
+import { profileActions } from "@/business/store/profile/profileReducer";
+import { AppDispatch } from "@/business/store/redux/store";
+import { Feather, FontAwesome } from "@expo/vector-icons";
+import { Href, router, Tabs } from "expo-router";
+import React, { useEffect, useMemo, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
-import Swiper from "react-native-swiper";
+import { useDispatch } from "react-redux";
 import HomeScreen from "./home";
-import RecentMessagesScreen from "./recent-messages";
 import NotificationsScreen from "./notifications";
 import ProfileScreen from "./profile";
+import RecentMessagesScreen from "./recent-messages";
 
 enum TabRoutes {
   home = "home",
@@ -17,6 +19,7 @@ enum TabRoutes {
 
 const TabLayout = () => {
   const [currentTab, setCurrentTab] = useState(TabRoutes.home);
+  const dispatch = useDispatch<AppDispatch>();
 
   const tabs = useMemo(
     () => [
@@ -73,6 +76,10 @@ const TabLayout = () => {
     ],
     [currentTab],
   );
+
+  useEffect(() => {
+    dispatch(profileActions.getCurrentProfile());
+  }, [dispatch]);
 
   return (
     <>

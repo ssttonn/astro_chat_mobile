@@ -4,4 +4,7 @@ export const APIRoutes = {
   verifyRegisterOtp: "/auth/register/verify",
   submitRegisterInfo: "/auth/register/submit-info",
   resendRegisterOtp: "/auth/register/resend-otp",
+  refreshToken: "/auth/refresh-token",
+  getProfile: "/profile/me",
+  updateProfile: "/profile/me",
 };

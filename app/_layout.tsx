@@ -6,6 +6,8 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 import Toast, { ErrorToast, SuccessToast } from "react-native-toast-message";
 import "../global.css";
+import { Provider } from "react-redux";
+import { store } from "@/business/store/redux/store";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -31,7 +33,7 @@ export default function RootLayout() {
   }
 
   return (
-    <>
+    <Provider store={store}>
       <Stack initialRouteName="(auth)" screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(auth)" />
       </Stack>
@@ -83,6 +85,6 @@ export default function RootLayout() {
           ),
         }}
       />
-    </>
+    </Provider>
   );
 }

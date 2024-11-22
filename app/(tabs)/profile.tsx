@@ -3,8 +3,12 @@ import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import Clickable from "@/components/common/Clickable";
+import { useSelector } from "react-redux";
+import { RootState } from "@/business/store/redux/store";
 
 const ProfileScreen = () => {
+  const { currentUser } = useSelector((state: RootState) => state.profile);
+
   return (
     <View className="items-center bg-white flex-1 shadow-main">
       <SafeAreaView
@@ -28,7 +32,11 @@ const ProfileScreen = () => {
             height={150}
             className="rounded-full"
           />
-          <Text className="text-2xl font-KelsonBold">#sstonn</Text>
+          {currentUser?.username && (
+            <Text className="text-2xl font-KelsonBold">
+              {`#${currentUser!.username}`}
+            </Text>
+          )}
         </View>
 
         <View className="flex flex-row gap-2 p-2">
