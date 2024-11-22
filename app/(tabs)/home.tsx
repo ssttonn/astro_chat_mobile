@@ -25,9 +25,9 @@ const HomeScreen = () => {
   }, [removeAccessToken]);
 
   return (
-    <SafeAreaView className="bg-white flex-1">
+    <SafeAreaView className="bg-whiteGrey-300 flex-1">
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View className="bg-whiteGrey-300 flex-1 gap-2">
+        <View className="flex-1 gap-2">
           <View className="flex flex-row px-4 py-2 justify-between items-center bg-white">
             <Text className="text-lg font-KelsonBold">
               Welcome back, #sstonn
@@ -63,7 +63,7 @@ const HomeScreen = () => {
                 }
               />
             </View>
-            <FlatList
+            {/* <FlatList
               data={[
                 { id: 1, name: "John Doe" },
                 { id: 2, name: "Jane Doe" },
@@ -91,7 +91,7 @@ const HomeScreen = () => {
                   <Text className="text-lg font-KelsonBold">{item.name}</Text>
                 </View>
               )}
-            />
+            /> */}
           </View>
         </View>
       </TouchableWithoutFeedback>

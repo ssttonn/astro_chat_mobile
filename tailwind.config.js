@@ -5,6 +5,9 @@ module.exports = {
   presets: [require("nativewind/preset")],
   theme: {
     extend: {
+      boxShadow: {
+        main: "0 0px 20px -30px rgba(0,0,0,0.08)",
+      },
       fontFamily: {
         KelsonRegular: ["KelsonRegular", "sans-serif"],
         KelsonBold: ["KelsonBold", "sans-serif"],
