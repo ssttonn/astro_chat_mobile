@@ -16,7 +16,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.sstonn.astroChat"
     },
     "web": {
       "bundler": "metro",
@@ -38,6 +39,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "2f184c8b-f22b-4bdb-aa53-56d6144e67be"
+      }
+    },
+    "owner": "sstonn"
   }
 }

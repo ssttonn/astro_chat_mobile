@@ -1,13 +1,11 @@
-import { Text } from "react-native";
-import React, { useEffect } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import LottieView from "lottie-react-native";
 import Assets from "@/constants/Assets";
-import * as SecureStore from "expo-secure-store";
-import { router } from "expo-router";
-import DBKey from "@/constants/DBKey";
-import useAccessToken from "@/hooks/useAccessToken";
 import ScreenRoutes from "@/constants/ScreenRoutes";
+import useAccessToken from "@/hooks/useAccessToken";
+import { router } from "expo-router";
+import LottieView from "lottie-react-native";
+import React, { useEffect } from "react";
+import { Text } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const SplashScreen = () => {
   const { getAccessToken } = useAccessToken();
