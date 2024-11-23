@@ -9,6 +9,9 @@ const ScreenRoutes = {
   resetPassword: "/(auth)/(forgot-password)/reset-password" as Href,
   home: "/(tabs)/home" as Href,
   profile: "/(tabs)/profile" as Href,
+  notifications: "/(tabs)/notifications" as Href,
+  recentMessages: "/(tabs)/conversations" as Href,
+  chatRoom: "/(messages)/chat-room" as Href,
 };
 
 export default ScreenRoutes;

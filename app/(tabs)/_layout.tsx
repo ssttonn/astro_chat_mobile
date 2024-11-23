@@ -1,6 +1,6 @@
 import { profileActions } from "@/business/store/profile/profileReducer";
 import { AppDispatch } from "@/business/store/redux/store";
-import { Feather, FontAwesome } from "@expo/vector-icons";
+import { Feather, FontAwesome, Ionicons } from "@expo/vector-icons";
 import { Href, router, Tabs } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
@@ -8,11 +8,11 @@ import { useDispatch } from "react-redux";
 import HomeScreen from "./home";
 import NotificationsScreen from "./notifications";
 import ProfileScreen from "./profile";
-import RecentMessagesScreen from "./recent-messages";
+import ConversationsScreen from "./conversations";
 
 enum TabRoutes {
   home = "home",
-  recentMessages = "recent-messages",
+  recentMessages = "conversations",
   notifications = "notifications",
   profile = "profile",
 }
@@ -39,15 +39,15 @@ const TabLayout = () => {
         id: 1,
         name: TabRoutes.recentMessages,
         icon: (
-          <Feather
-            name={"message-circle"}
+          <Ionicons
+            name={"chatbubbles"}
             size={30}
             color={
               currentTab === TabRoutes.recentMessages ? "white" : "#4b5057"
             }
           />
         ),
-        screen: <RecentMessagesScreen key={1} />,
+        screen: <ConversationsScreen key={1} />,
       },
       {
         id: 2,

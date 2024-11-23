@@ -16,7 +16,6 @@ export interface ProfileState {
 const getCurrentProfile = createAsyncThunk<IUser>(
   "profile/getCurrentProfile",
   async () => {
-    console.log("getCurrentProfile");
     let responseData = await AxiosClient.get(APIRoutes.getProfile, {
       headers: {
         AuthRoutes: true,

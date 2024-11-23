@@ -7,4 +7,5 @@ export const APIRoutes = {
   refreshToken: "/auth/refresh-token",
   getProfile: "/profile/me",
   updateProfile: "/profile/me",
+  getConversations: "/chat/conversations",
 };

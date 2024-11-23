@@ -36,6 +36,8 @@ export default function RootLayout() {
     <Provider store={store}>
       <Stack initialRouteName="(auth)" screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="(messages)" />
       </Stack>
       <StatusBar style="auto" />
       <Toast
