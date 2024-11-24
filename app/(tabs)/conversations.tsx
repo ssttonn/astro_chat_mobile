@@ -1,6 +1,6 @@
-import { useRecentConversationsStore } from "@/business/store/conversations/recentConversationsStore";
+import { conversationsActions } from "@/business/store/conversations/conversationsReducer";
+import { AppDispatch, RootState } from "@/business/store/redux/store";
 import Clickable from "@/components/common/Clickable";
-import UserAvatar from "@/components/common/UserAvatar";
 import ConversationItem from "@/components/conversation/ConversationItem";
 import ScreenRoutes from "@/constants/ScreenRoutes";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -8,14 +8,38 @@ import { router } from "expo-router";
 import React, { useCallback, useEffect } from "react";
 import { FlatList, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useDispatch, useSelector } from "react-redux";
 
 const ConversationsScreen = () => {
-  const { conversations, status, fetchConversations } =
-    useRecentConversationsStore();
+  const { conversations } = useSelector(
+    (state: RootState) => state.conversations,
+  );
+
+  const { currentUser } = useSelector((state: RootState) => state.profile);
+
+  const { connected } = useSelector((state: RootState) => state.realtimeData);
+
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
-    fetchConversations(false);
-  }, [fetchConversations]);
+    dispatch(conversationsActions.onFetchConversationsAsync({}));
+  }, [dispatch]);
+
+  useEffect(() => {
+    const inititalizeSocket = async () => {
+      if (!currentUser || !connected) {
+        return;
+      }
+
+      dispatch(conversationsActions.listenToSocketEvents(currentUser.id));
+    };
+
+    inititalizeSocket();
+
+    return () => {
+      dispatch(conversationsActions.unlistenToSocketEvents());
+    };
+  }, [connected, dispatch, currentUser]);
 
   const onConversationPress = useCallback((conversationId: string) => {
     router.push(ScreenRoutes.chatRoom);

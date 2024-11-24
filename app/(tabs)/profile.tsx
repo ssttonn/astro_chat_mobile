@@ -80,7 +80,7 @@ const ProfileScreen = () => {
                     Phan Nguyễn Song Toàn
                   </Text>
                   <Text className="text-lg font-KelsonRegular text-dark-600">
-                    #sstonn
+                    #{currentUser?.email}
                   </Text>
                   <Text className="text-lg font-KelsonRegular text-dark-500 mt-2">
                     Life-long learner, software engineer, and entrepreneur

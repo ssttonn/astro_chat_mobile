@@ -1,8 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppDispatch } from "../redux/store";
-import { createSocketClient } from "@/business/data/services/SocketIOClient";
+import { SocketIOClient } from "@/business/data/services/SocketIOClient";
+import * as SecureStore from "expo-secure-store";
+import DBKey from "@/constants/DBKey";
 
-const socket = createSocketClient(process.env.EXPO_PUBLIC_URL);
+const socket = SocketIOClient;
 
 interface RealtimeDateState {
   connected: boolean;
@@ -25,6 +27,10 @@ const realtimeDataSlice = createSlice({
 const initializeSocket = () => {
   return async (dispatch: AppDispatch) => {
     dispatch(realtimeDataSlice.actions.setConnected(false));
+
+    socket.io.opts.extraHeaders = {
+      token: (await SecureStore.getItemAsync(DBKey.ACCESS_TOKEN)) ?? "",
+    };
 
     try {
       console.log("Connecting to socket server: ");
