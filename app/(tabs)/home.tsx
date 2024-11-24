@@ -1,22 +1,33 @@
-import {
-  View,
-  Text,
-  Image,
-  TouchableWithoutFeedback,
-  Keyboard,
-  FlatList,
-} from "react-native";
-import React, { useCallback } from "react";
-import MainButton from "@/components/common/MainButton";
-import { SafeAreaView } from "react-native-safe-area-context";
-import useAccessToken from "@/hooks/useAccessToken";
-import { router } from "expo-router";
-import ScreenRoutes from "@/constants/ScreenRoutes";
+import { realtimeDataActions } from "@/business/store/realtime/realtimeDataReducer";
+import { AppDispatch, RootState } from "@/business/store/redux/store";
 import Clickable from "@/components/common/Clickable";
 import MainTextField from "@/components/common/MainTextField";
+import ScreenRoutes from "@/constants/ScreenRoutes";
+import useAccessToken from "@/hooks/useAccessToken";
 import { FontAwesome } from "@expo/vector-icons";
+import { router } from "expo-router";
+import React, { useCallback, useEffect } from "react";
+import {
+  Image,
+  Keyboard,
+  Text,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useDispatch, useSelector } from "react-redux";
+import { io } from "socket.io-client";
 
 const HomeScreen = () => {
+  const { connected } = useSelector((state: RootState) => state.realtimeData);
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    console.log("isConnected", connected);
+    if (connected) return;
+    dispatch(realtimeDataActions.initializeSocket());
+  }, [dispatch, connected]);
+
   const { removeAccessToken } = useAccessToken();
   const onLogout = useCallback(() => {
     removeAccessToken();

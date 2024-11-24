@@ -1,9 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { profileReducer } from "../profile/profileReducer";
+import { realtimeDataReducer } from "../realtime/realtimeDataReducer";
 
 export const store = configureStore({
   reducer: {
     profile: profileReducer,
+    realtimeData: realtimeDataReducer,
   },
 });
 

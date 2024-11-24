@@ -3,8 +3,6 @@ import DBKey from "@/constants/DBKey";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
-axios.defaults.baseURL = process.env.EXPO_PUBLIC_API_URL;
-
 axios.interceptors.request.use(
   async (request) => {
     // Edit request config
@@ -81,6 +79,6 @@ axios.interceptors.response.use(
   },
 );
 
-const AxiosClient = axios;
+let AxiosClient = axios;
 
 export default AxiosClient;
