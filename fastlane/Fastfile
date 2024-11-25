@@ -37,7 +37,7 @@ platform :android do
     )
 
     build_android_app(
-      task: "bundle",
+      task: "bundle assemble",
       build_type: "Release",
       print_command: false,
       project_dir: "android/",
@@ -53,7 +53,7 @@ platform :android do
   end
 
   desc "Build and upload a new version to the Google Play with selected track"
-  lane :buildAndUpload do |options|
+  lane :build do |options|
     previous_build_number = google_play_track_version_codes(
       track: options[:track],
       json_key: "#{Dir.pwd}/keys/ac_secret.json"
@@ -73,43 +73,81 @@ platform :android do
       version_name: version_name,
       version_code: previous_build_number + 1
     )
-    
+  end
+
+  lane :upload do |options|
     upload_to_play_store(
       track: options[:track],
-      release_status: options[:track] == "production" ? "completed" : "draft",
+      release_status: options[:release_status],
       skip_upload_apk: true
+    )
+  end
+
+  desc "Deploy a new version to the Firebase App Distribution"
+  lane :distribute do |options|
+    build(
+      track: "internal",
+    )
+
+    firebase_app_distribution(
+      app: ENV["FIREBASE_APP_ID"],
+      firebase_cli_token: ENV["FIREBASE_APP_TOKEN"],
+      release_notes: "Lots of amazing new features to test out!",
+      testers: "sstonn2501@gmail.com",
+      service_credentials_file: "#{Dir.pwd}/keys/ac_secret.json",
+      android_artifact_type: "APK",
     )
   end
   
   desc "Deploy a new beta version to the Google Play"
   lane :beta do
-    buildAndUpload(
+    build(
       track: "beta",
       version_name: options[:version_name],
+    )
+
+    upload(
+      track: "beta",
+      release_status: "draft"
     )
   end
 
   desc "Deploy a new alpha version to the Google Play"
   lane :alpha do |options|
-    buildAndUpload(
+    build(
       track: "alpha",
       version_name: options[:version_name],
+    )
+
+    upload(
+      track: "alpha",
+      release_status: "draft"
     )
   end
 
   desc "Deploy a new internal version to the Google Play"
   lane :internal do |options|
-    buildAndUpload(
+    build(
       track: "internal",
       version_name: options[:version_name],
+    )
+
+    upload(
+      track: "internal",
+      release_status: "draft"
     )
   end
 
   desc "Deploy a new version to the Google Play"
   lane :production do
-    buildAndUpload(
+    build(
       track: "production",
       version_name: options[:version_name],
+    )
+
+    upload(
+      track: "production",
+      release_status: "completed"
     )
   end
 end

@@ -31,13 +31,29 @@ Runs all the tests
 
 
 
-### android buildAndUpload
+### android build
 
 ```sh
-[bundle exec] fastlane android buildAndUpload
+[bundle exec] fastlane android build
 ```
 
 Build and upload a new version to the Google Play with selected track
+
+### android upload
+
+```sh
+[bundle exec] fastlane android upload
+```
+
+
+
+### android distribute
+
+```sh
+[bundle exec] fastlane android distribute
+```
+
+Deploy a new version to the Firebase App Distribution
 
 ### android beta
 
