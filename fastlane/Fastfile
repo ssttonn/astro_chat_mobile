@@ -1,0 +1,115 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:android)
+
+before_all do |lane, options|
+  # This block is called before each lane
+  Dotenv.load('.env.secret')
+end
+
+
+platform :android do
+  desc "Runs all the tests"
+  lane :test do
+    gradle(task: "test")
+  end
+
+  lane :buildRelease do |options|
+    version_name = options[:version_name]
+    version_code = options[:version_code]
+
+    build_android_app(
+      task: "clean",
+      project_dir: "android/",
+    )
+
+    build_android_app(
+      task: "bundle",
+      build_type: "Release",
+      print_command: false,
+      project_dir: "android/",
+      properties: {
+        "android.injected.signing.store.file" => "#{Dir.pwd}/keys/astro_chat_key.keystore",
+        "android.injected.signing.store.password" => ENV["ANDROID_SIGNING_KEY_PASSWORD"],
+        "android.injected.signing.key.alias" => "astro_chat_key",
+        "android.injected.signing.key.password" => ENV["ANDROID_SIGNING_KEY_PASSWORD"],
+        "android.injected.version.name" => version_name,
++       "android.injected.version.code" => version_code
+      }
+    )
+  end
+
+  desc "Build and upload a new version to the Google Play with selected track"
+  lane :buildAndUpload do |options|
+    previous_build_number = google_play_track_version_codes(
+      track: options[:track],
+      json_key: "#{Dir.pwd}/keys/ac_secret.json"
+    )[0]
+    
+    version_name = options[:version_name] || google_play_track_release_names(
+      track: options[:track],
+      json_key: "#{Dir.pwd}/keys/ac_secret.json"
+    )
+
+    increment_version_code(
+      version_code: previous_build_number + 1,
+      gradle_file_path: "android/app/build.gradle"
+    )
+    
+    buildRelease(
+      version_name: version_name,
+      version_code: previous_build_number + 1
+    )
+    
+    upload_to_play_store(
+      track: options[:track],
+      release_status: options[:track] == "production" ? "completed" : "draft",
+      skip_upload_apk: true
+    )
+  end
+  
+  desc "Deploy a new beta version to the Google Play"
+  lane :beta do
+    buildAndUpload(
+      track: "beta",
+      version_name: options[:version_name],
+    )
+  end
+
+  desc "Deploy a new alpha version to the Google Play"
+  lane :alpha do |options|
+    buildAndUpload(
+      track: "alpha",
+      version_name: options[:version_name],
+    )
+  end
+
+  desc "Deploy a new internal version to the Google Play"
+  lane :internal do |options|
+    buildAndUpload(
+      track: "internal",
+      version_name: options[:version_name],
+    )
+  end
+
+  desc "Deploy a new version to the Google Play"
+  lane :production do
+    buildAndUpload(
+      track: "production",
+      version_name: options[:version_name],
+    )
+  end
+end

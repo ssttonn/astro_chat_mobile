@@ -8,8 +8,12 @@ node_modules/
 dist/
 web-build/
 expo-env.d.ts
-android/
-ios/
+
+/fastlane/report.xml
+/fastlane/Preview.html
+/fastlane/keys/
+/fastlane/metadata/
+/fastlane/.env*
 
 # Native
 *.orig.*

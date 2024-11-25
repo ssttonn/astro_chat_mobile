@@ -17,7 +17,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.sstonn.astroChat"
+      "package": "com.astrotify.AstroChat"
     },
     "web": {
       "bundler": "metro",
