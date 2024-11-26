@@ -16,7 +16,15 @@ jobs:
      with:
        ruby-version: 3.3.5
        bundler-cache: true
- 
+
+   - name: Setup Node 
+     uses: actions/setup-node@v3
+     with:
+       node-version: '22.11.0'
+    
+   - name: Install node modules
+     run: npm install
+  
    - name: Decode Service Account Key JSON File
      uses: timheuer/base64-to-file@v1.2
      id: service_account_json_file
