@@ -8,7 +8,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { AppDispatch } from "../redux/store";
 import { SocketIOClient } from "@/business/data/services/SocketIOClient";
 import AxiosClient from "@/business/data/services/axiosClient";
-import { APIRoutes } from "@/constants/api_routes";
+import { APIRoutes } from "@/constants/apiRoutes";
 
 export enum ConversationsStatus {
   IDLE = "idle",

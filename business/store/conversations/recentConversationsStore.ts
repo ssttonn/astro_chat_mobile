@@ -5,7 +5,7 @@ import IPagination, {
   initialPagination,
 } from "@/business/data/models/IPagination";
 import AxiosClient from "@/business/data/services/axiosClient";
-import { APIRoutes } from "@/constants/api_routes";
+import { APIRoutes } from "@/constants/apiRoutes";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 

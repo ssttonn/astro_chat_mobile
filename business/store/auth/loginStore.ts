@@ -1,5 +1,5 @@
 import AxiosClient from "@/business/data/services/axiosClient";
-import { APIRoutes } from "@/constants/api_routes";
+import { APIRoutes } from "@/constants/apiRoutes";
 import axios from "axios";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
