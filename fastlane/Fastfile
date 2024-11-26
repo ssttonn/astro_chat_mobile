@@ -243,7 +243,7 @@ platform :android do
     if version_name.nil? || !version_name.match?(/\d+\.\d+\.\d+/) 
       version_name = google_play_track_release_names(
         track: "internal",
-        json_key: "#{Dir.pwd}/keys/ac_secret.json"
+        json_key: ENV["GOOGLE_PLAY_JSON_FILE"] || "#{Dir.pwd}/keys/ac_secret.json"
       )[0] || "1.0.0"
     end
 
