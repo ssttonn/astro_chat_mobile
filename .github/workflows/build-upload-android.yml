@@ -18,14 +18,14 @@ jobs:
        bundler-cache: true
  
    - name: Decode Service Account Key JSON File
-     uses: timheuer/base64-to-file@v1
+     uses: timheuer/base64-to-file@v1.2
      id: service_account_json_file
      with:
        fileName: "serviceAccount.json"
        encodedString: ${{ secrets.GOOGLE_PLAY_JSON_FILE }}
  
    - name: Decode Keystore File
-     uses: timheuer/base64-to-file@v1
+     uses: timheuer/base64-to-file@v1.2
      id: android_keystore
      with:
        fileName: "android_keystore.keystore"
