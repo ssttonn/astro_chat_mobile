@@ -35,9 +35,9 @@ jobs:
      run: bundle exec fastlane android deploy
      env:
        KEYSTORE_FILE: ${{ steps.android_keystore.outputs.filePath }}
-       KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-       KEY_ALIAS: ${{ secrets.KEY_ALIAS}}
-       KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+       KEYSTORE_PASSWORD: ${{ secrets.ANDROID_SIGNING_KEY_PASSWORD }}
+       KEY_ALIAS: ${{ secrets.ANDROID_SIGNING_KEY_ALIAS }}
+       KEY_PASSWORD: ${{ secrets.ANDROID_SIGNING_KEY_PASSWORD }}
        ANDROID_JSON_KEY_FILE: ${{ steps.service_account_json_file.outputs.filePath }}
  
    - name: Upload build artifacts
