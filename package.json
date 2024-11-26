@@ -14,7 +14,8 @@
     "android:beta": "fastlane android beta",
     "android:alpha": "fastlane android alpha",
     "android:production": "fastlane android production",
-    "android:distribute": "fastlane android distribute"
+    "android:distribute": "fastlane android distribute",
+    "android:deploy": "fastlane android deploy"
   },
   "jest": {
     "preset": "jest-expo"
