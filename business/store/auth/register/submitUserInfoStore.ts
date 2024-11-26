@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { RegisterStatus } from "./registerStore";
 import { immer } from "zustand/middleware/immer";
 import AxiosClient from "@/business/data/services/axiosClient";
-import { APIRoutes } from "@/constants/APIRoutes";
+import { APIRoutes } from "@/constants/apiRoutes";
 
 interface SubmitUserInfoState {
   form: {

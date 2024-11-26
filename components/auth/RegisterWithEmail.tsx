@@ -5,7 +5,7 @@ import MainTextField from "../common/MainTextField";
 import MainButton from "../common/MainButton";
 import OAuthenticationMethods, { AuthMethod } from "./OAuthenticationMethods";
 import { router } from "expo-router";
-import Assets from "@/constants/Assets";
+import Assets from "@/constants/assets";
 
 interface RegisterWithEmailProps {
   onPress?: (e: any) => void;

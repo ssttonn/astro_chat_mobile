@@ -5,7 +5,7 @@ import CircularIcon from "@/components/common/CircularIcon";
 import LoadingView from "@/components/common/LoadingView";
 import MainButton from "@/components/common/MainButton";
 import MainTextField from "@/components/common/MainTextField";
-import Assets from "@/constants/Assets";
+import Assets from "@/constants/assets";
 import useAccessToken from "@/hooks/useAccessToken";
 import useRegister from "@/hooks/useRegister";
 import useRegisterToken from "@/hooks/useRegisterToken";
@@ -16,7 +16,7 @@ import React, { useCallback, useMemo } from "react";
 import { Text, TouchableOpacity } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import useValidators from "@/hooks/useValidators";
-import ScreenRoutes from "@/constants/ScreenRoutes";
+import ScreenRoutes from "@/constants/screenRoutes";
 import Toast from "react-native-toast-message";
 
 const SubmitRegisterInfoScreen = () => {

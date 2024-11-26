@@ -1,4 +1,4 @@
-import Assets from "@/constants/Assets";
+import Assets from "@/constants/assets";
 import React, { memo, useCallback } from "react";
 import { Text, View } from "react-native";
 import MainButton from "../common/MainButton";

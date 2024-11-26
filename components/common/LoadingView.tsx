@@ -1,7 +1,7 @@
 import { View, Text } from "react-native";
 import React from "react";
 import LottieView from "lottie-react-native";
-import Assets from "@/constants/Assets";
+import Assets from "@/constants/assets";
 
 interface LoadingViewProps {
   isLoading: boolean;

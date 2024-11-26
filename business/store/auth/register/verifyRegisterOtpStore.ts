@@ -2,7 +2,7 @@ import { immer } from "zustand/middleware/immer";
 import { RegisterStatus } from "./registerStore";
 import { create } from "zustand";
 import AxiosClient from "@/business/data/services/axiosClient";
-import { APIRoutes } from "@/constants/APIRoutes";
+import { APIRoutes } from "@/constants/apiRoutes";
 
 interface VerifyRegisterOtpState {
   status: RegisterStatus;

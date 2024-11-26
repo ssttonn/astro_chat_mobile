@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity } from "react-native";
 import React, { useCallback, useRef } from "react";
 import AuthMainLayout from "@/components/auth/AuthMainLayout";
 import LottieView from "lottie-react-native";
-import Assets from "@/constants/Assets";
+import Assets from "@/constants/assets";
 import { OtpInput } from "react-native-otp-entry";
 import { router } from "expo-router";
 
@@ -14,7 +14,7 @@ import {
   useRegisterStore,
 } from "@/business/store/auth/register/registerStore";
 
-import ScreenRoutes from "@/constants/ScreenRoutes";
+import ScreenRoutes from "@/constants/screenRoutes";
 import useRegisterToken from "@/hooks/useRegisterToken";
 import Toast from "react-native-toast-message";
 
