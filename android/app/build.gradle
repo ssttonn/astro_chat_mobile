@@ -91,7 +91,7 @@ android {
         applicationId 'com.astrotify.AstroChat'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1732608417
+        versionCode 1732611493
         versionName "1.0.1"
     }
     signingConfigs {
