@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppDispatch } from "../redux/store";
 import { SocketIOClient } from "@/business/data/services/SocketIOClient";
 import * as SecureStore from "expo-secure-store";
-import DBKey from "@/constants/dbKey";
+import DBKey from "@/constants/db_key";
 
 const socket = SocketIOClient;
 

@@ -3,7 +3,7 @@ import CircularIcon from "@/components/common/CircularIcon";
 import MainButton from "@/components/common/MainButton";
 import MainTextField from "@/components/common/MainTextField";
 import Assets from "@/constants/assets";
-import ScreenRoutes from "@/constants/screenRoutes";
+import ScreenRoutes from "@/constants/screen_routes";
 import { Entypo } from "@expo/vector-icons";
 import { router } from "expo-router";
 import LottieView from "lottie-react-native";

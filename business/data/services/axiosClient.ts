@@ -1,5 +1,5 @@
-import { APIRoutes } from "@/constants/apiRoutes";
-import DBKey from "@/constants/dbKey";
+import { APIRoutes } from "@/constants/api_routes";
+import DBKey from "@/constants/db_key";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 

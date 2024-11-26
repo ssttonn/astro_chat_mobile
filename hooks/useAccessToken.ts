@@ -1,4 +1,4 @@
-import DBKey from "@/constants/dbKey";
+import DBKey from "@/constants/db_key";
 import * as SecureStore from "expo-secure-store";
 import { useCallback } from "react";
 

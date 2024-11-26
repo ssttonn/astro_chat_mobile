@@ -14,7 +14,7 @@ import {
   useRegisterStore,
 } from "@/business/store/auth/register/registerStore";
 
-import ScreenRoutes from "@/constants/screenRoutes";
+import ScreenRoutes from "@/constants/screen_routes";
 import useRegisterToken from "@/hooks/useRegisterToken";
 import Toast from "react-native-toast-message";
 

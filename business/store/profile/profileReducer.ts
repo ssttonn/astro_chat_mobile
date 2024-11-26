@@ -1,6 +1,6 @@
 import IUser from "@/business/data/models/IUser";
 import AxiosClient from "@/business/data/services/axiosClient";
-import { APIRoutes } from "@/constants/apiRoutes";
+import { APIRoutes } from "@/constants/api_routes";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 enum ProfileStatus {

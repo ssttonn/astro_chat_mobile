@@ -11,7 +11,7 @@ import LoadingView from "@/components/common/LoadingView";
 import MainButton from "@/components/common/MainButton";
 import MainTextField from "@/components/common/MainTextField";
 import Assets from "@/constants/assets";
-import ScreenRoutes from "@/constants/screenRoutes";
+import ScreenRoutes from "@/constants/screen_routes";
 import useRegister from "@/hooks/useRegister";
 import useRegisterToken from "@/hooks/useRegisterToken";
 import useValidators from "@/hooks/useValidators";
