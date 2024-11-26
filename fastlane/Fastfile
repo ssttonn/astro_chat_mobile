@@ -51,12 +51,6 @@ platform :android do
 
     build_type = options[:build_type] || "Release"
 
-    # # Build the app
-    # build_android_app(
-    #   task: "clean",
-    #   project_dir: "android/",
-    # )
-
     android_set_version_code(
       version_code: version_code,
       gradle_file: "android/app/build.gradle"
@@ -67,17 +61,24 @@ platform :android do
       gradle_file: "android/app/build.gradle"
     )
 
+    # Clean the app before building
+    gradle(
+      task: "clean",
+      project_dir: "android/",
+    )
+
+    # Build the app
     build_android_app(
       task: "bundle assemble",
       build_type: build_type,
       print_command: false,
       project_dir: "android/",
-      properties: {
-        "android.injected.signing.store.file" => "#{Dir.pwd}/keys/astro_chat_key.keystore",
+      properties: build_type == "Release" ? {
+        "android.injected.signing.store.file" => ENV["ANDROID_SIGNING_KEY_FILE"] || "#{Dir.pwd}/keys/astro_chat_key.keystore",
         "android.injected.signing.store.password" => ENV["ANDROID_SIGNING_KEY_PASSWORD"],
         "android.injected.signing.key.alias" => ENV["ANDROID_SIGNING_KEY_ALIAS"],
         "android.injected.signing.key.password" => ENV["ANDROID_SIGNING_KEY_PASSWORD"]
-      }
+      } : nil
     )
   end
 
@@ -85,7 +86,9 @@ platform :android do
     upload_to_play_store(
       track: options[:track],
       release_status: options[:release_status],
-      skip_upload_apk: true
+      skip_upload_apk: true,
+      json_key: ENV["GOOGLE_PLAY_JSON_FILE"] || "#{Dir.pwd}/keys/ac_secret.json",
+      aab: "android/app/build/outputs/bundle/release/app-release.aab",
     )
   end
 
@@ -102,8 +105,6 @@ platform :android do
       app: ENV["FIREBASE_APP_ID"],
       firebase_cli_token: ENV["FIREBASE_APP_TOKEN"],
       release_notes: "Lots of amazing new features to test out!",
-      testers: "sstonn2501@gmail.com",
-      # service_credentials_file: "#{Dir.pwd}/keys/AstroChatGGS.json",
       android_artifact_type: "APK",
       groups: "astrotify-testers"
     )
@@ -163,7 +164,8 @@ platform :android do
 
     build(
       version_code: version_code,
-      version_name: version_name
+      version_name: version_name,
+      build_type: "Release"
     )
 
     upload(
@@ -194,6 +196,35 @@ platform :android do
 
     send_slack_message(
       message: "Successfully deployed a new production version to the Google Play",
+      version_name: version_name,
+      version_code: version_code
+    )
+  end
+
+  desc "Distribute and deploy new version to the Firebase App Distribution and Google Play"
+  lane :deploy do
+    version_name, version_code = get_version
+
+    build(
+      version_code: version_code,
+      version_name: version_name
+    )
+
+    firebase_app_distribution(
+      app: ENV["FIREBASE_APP_ID"],
+      firebase_cli_token: ENV["FIREBASE_APP_TOKEN"],
+      release_notes: "Lots of amazing new features to test out!",
+      android_artifact_type: "APK",
+      groups: "astrotify-testers"
+    )
+
+    upload(
+      track: "internal",
+      release_status: "draft"
+    )
+
+    send_slack_message(
+      message: "Successfully deployed a new version to the Firebase App Distribution and Google Play",
       version_name: version_name,
       version_code: version_code
     )
