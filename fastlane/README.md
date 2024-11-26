@@ -23,29 +23,13 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 Runs all the tests
 
-### android buildRelease
-
-```sh
-[bundle exec] fastlane android buildRelease
-```
-
-
-
 ### android build
 
 ```sh
 [bundle exec] fastlane android build
 ```
 
-Build and upload a new version to the Google Play with selected track
-
-### android upload
-
-```sh
-[bundle exec] fastlane android upload
-```
-
-
+Build the Android app and generate the APK, AAB
 
 ### android distribute
 
