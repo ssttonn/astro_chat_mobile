@@ -56,7 +56,7 @@ jobs:
        ANDROID_SIGNING_KEY_FILE: ${{ steps.android_keystore.outputs.filePath }}
        ANDROID_SIGNING_KEY_PASSWORD: ${{ secrets.ANDROID_SIGNING_KEY_PASSWORD }}
        ANDROID_SIGNING_KEY_ALIAS: ${{ secrets.ANDROID_SIGNING_KEY_ALIAS }}
-       ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+       ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_SIGNING_KEY_PASSWORD }}
        FIREBASE_APP_TOKEN: ${{ secrets.FIREBASE_APP_TOKEN }}
        FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
