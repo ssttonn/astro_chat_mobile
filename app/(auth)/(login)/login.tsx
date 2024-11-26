@@ -8,7 +8,7 @@ import LoadingView from "@/components/common/LoadingView";
 import MainButton from "@/components/common/MainButton";
 import MainTextField from "@/components/common/MainTextField";
 import Assets from "@/constants/assets";
-import ScreenRoutes from "@/constants/screen_routes";
+import ScreenRoutes from "@/constants/screenRoutes";
 import useAccessToken from "@/hooks/useAccessToken";
 import useValidators from "@/hooks/useValidators";
 import { Entypo, Feather } from "@expo/vector-icons";

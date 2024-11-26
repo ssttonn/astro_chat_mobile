@@ -16,7 +16,7 @@ import React, { useCallback, useMemo } from "react";
 import { Text, TouchableOpacity } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import useValidators from "@/hooks/useValidators";
-import ScreenRoutes from "@/constants/screen_routes";
+import ScreenRoutes from "@/constants/screenRoutes";
 import Toast from "react-native-toast-message";
 
 const SubmitRegisterInfoScreen = () => {

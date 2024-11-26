@@ -2,7 +2,7 @@ import { conversationsActions } from "@/business/store/conversations/conversatio
 import { AppDispatch, RootState } from "@/business/store/redux/store";
 import Clickable from "@/components/common/Clickable";
 import ConversationItem from "@/components/conversation/ConversationItem";
-import ScreenRoutes from "@/constants/screen_routes";
+import ScreenRoutes from "@/constants/screenRoutes";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useCallback, useEffect } from "react";

@@ -2,7 +2,7 @@ import { realtimeDataActions } from "@/business/store/realtime/realtimeDataReduc
 import { AppDispatch, RootState } from "@/business/store/redux/store";
 import Clickable from "@/components/common/Clickable";
 import MainTextField from "@/components/common/MainTextField";
-import ScreenRoutes from "@/constants/screen_routes";
+import ScreenRoutes from "@/constants/screenRoutes";
 import useAccessToken from "@/hooks/useAccessToken";
 import { FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";

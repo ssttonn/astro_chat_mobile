@@ -1,5 +1,5 @@
 import Assets from "@/constants/assets";
-import ScreenRoutes from "@/constants/screen_routes";
+import ScreenRoutes from "@/constants/screenRoutes";
 import useAccessToken from "@/hooks/useAccessToken";
 import { router } from "expo-router";
 import LottieView from "lottie-react-native";
