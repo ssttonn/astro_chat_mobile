@@ -63,11 +63,11 @@ platform :android do
       gradle_file: "android/app/build.gradle"
     )
 
-    # Clean the app before building
-    gradle(
-      task: "clean",
-      project_dir: "android/",
-    )
+    # # Clean the app before building
+    # gradle(
+    #   task: "clean",
+    #   project_dir: "android/",
+    # )
 
     # Build the app
     build_android_app(
