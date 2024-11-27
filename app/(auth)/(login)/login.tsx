@@ -168,7 +168,7 @@ const LoginScreen = () => {
           Forgot password?
         </Link>
         <MainButton
-          title="Login"
+          title="Login now"
           isButtonEnabled={isButtonEnabled}
           onPress={loginWithEmailAndPassword}
         />
