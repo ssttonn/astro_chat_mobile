@@ -1,6 +1,5 @@
-import { View, Text } from "react-native";
-import React from "react";
 import { Stack } from "expo-router";
+import React from "react";
 
 const MessageLayout = () => {
   return (
@@ -9,7 +8,8 @@ const MessageLayout = () => {
         headerShown: false,
       }}
     >
-      <Stack.Screen name="chat-room" />
+      <Stack.Screen name="conversation-detail" />
+      <Stack.Screen name="new-conversation" />
     </Stack>
   );
 };

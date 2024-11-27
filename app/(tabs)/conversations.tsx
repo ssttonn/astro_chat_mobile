@@ -42,14 +42,18 @@ const ConversationsScreen = () => {
   }, [connected, dispatch, currentUser]);
 
   const onConversationPress = useCallback((conversationId: string) => {
-    router.push(ScreenRoutes.chatRoom);
+    router.push(ScreenRoutes.conversationDetail);
   }, []);
 
   return (
     <SafeAreaView className="bg-white flex-1">
       <View className="flex flex-row px-4 py-2 justify-between items-center">
         <Text className="text-3xl font-KelsonBold text-dark-600">Messages</Text>
-        <Clickable>
+        <Clickable
+          onPress={useCallback(() => {
+            router.push(ScreenRoutes.newConversation);
+          }, [])}
+        >
           <MaterialCommunityIcons
             name="message-plus"
             size={30}

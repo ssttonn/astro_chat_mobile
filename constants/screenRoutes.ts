@@ -11,7 +11,8 @@ const ScreenRoutes = {
   profile: "/(tabs)/profile" as Href,
   notifications: "/(tabs)/notifications" as Href,
   recentMessages: "/(tabs)/conversations" as Href,
-  chatRoom: "/(messages)/chat-room" as Href,
+  conversationDetail: "/(messages)/conversation-detail" as Href,
+  newConversation: "/(messages)/new-conversation" as Href,
 };
 
 export default ScreenRoutes;

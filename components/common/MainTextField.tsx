@@ -16,23 +16,28 @@ interface MainTextFieldProps {
       ) => React.ReactNode);
 }
 
-const MainTextField = ({
-  label,
-  type,
-  prefix,
-  suffix,
-  containerClassName,
-  inputClassName,
-  value,
-  validator,
-  ...props
-}: MainTextFieldProps & TextInputProps) => {
+const MainTextField = (
+  {
+    label,
+    type,
+    prefix,
+    suffix,
+    containerClassName,
+    inputClassName,
+    value,
+    validator,
+    ...props
+  }: MainTextFieldProps & TextInputProps,
+  ref?: any,
+) => {
   const [isFocused, setIsFocused] = useState(false);
   const [isTextObscured, setIsObscured] = useState(type === "password");
 
+  console.log("MainTextField rendered: ", label);
   return (
     <View
-      className={`flex items-center gap-2 bg-whiteGrey-100 p-3 rounded-2xl w-full ${isFocused ? "border-2 border-primary" : "border-2 border-transparent"} ${containerClassName}`}
+      ref={ref}
+      className={`flex items-center gap-2 bg-whiteGrey-100 p-3 rounded-2xl ${isFocused ? "border-2 border-primary" : "border-2 border-transparent"} ${containerClassName}`}
     >
       <View className="flex flex-row items-center">
         {prefix}
@@ -63,4 +68,4 @@ const MainTextField = ({
   );
 };
 
-export default memo(MainTextField);
+export default memo(React.forwardRef(MainTextField));

@@ -1,19 +1,29 @@
-import { View, Text, TouchableOpacity, Keyboard } from "react-native";
 import React from "react";
+import { Keyboard, TouchableOpacity } from "react-native";
 
-interface ClickableProps {
+export interface ClickableProps {
   children?: React.ReactNode;
   className?: string;
+  shouldDismissKeyboardWhenClicked?: boolean;
   onPress?: (e: any) => void;
 }
 
-const Clickable = ({ className, children, onPress }: ClickableProps) => {
+const Clickable = ({
+  className,
+  children,
+  onPress,
+  shouldDismissKeyboardWhenClicked = true,
+}: ClickableProps) => {
   return (
     <TouchableOpacity
       onPress={(e) => {
-        Keyboard.dismiss();
+        if (shouldDismissKeyboardWhenClicked) {
+          Keyboard.dismiss();
+          console.log("Keyboard dismissed");
+        }
         onPress?.(e);
       }}
+      disabled={!onPress}
       className={className}
     >
       {children}
