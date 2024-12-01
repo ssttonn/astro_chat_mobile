@@ -14,10 +14,10 @@ axios.interceptors.request.use(
     const accessToken = await SecureStore.getItemAsync(DBKey.ACCESS_TOKEN);
     let refreshToken: any = await SecureStore.getItemAsync(DBKey.REFRESH_TOKEN);
     const accessTokenExpiryDate = await SecureStore.getItemAsync(
-      DBKey.ACCESS_TOKEN_EXPIRY_DATE,
+      DBKey.ACCESS_TOKEN_EXPIRY_DATE
     );
     const refreshTokenExpiryDate = await SecureStore.getItemAsync(
-      DBKey.REFRESH_TOKEN_EXPIRY_DATE,
+      DBKey.REFRESH_TOKEN_EXPIRY_DATE
     );
     if (
       accessToken &&
@@ -47,36 +47,37 @@ axios.interceptors.request.use(
         SecureStore.setItemAsync(DBKey.REFRESH_TOKEN, newRefreshToken),
         SecureStore.setItemAsync(
           DBKey.ACCESS_TOKEN_EXPIRY_DATE,
-          newAccessTokenExpiryDate,
+          newAccessTokenExpiryDate
         ),
         SecureStore.setItemAsync(
           DBKey.REFRESH_TOKEN_EXPIRY_DATE,
-          newRefreshTokenExpiryDate,
+          newRefreshTokenExpiryDate
         ),
       ]);
 
       request.headers.Authorization = `Bearer ${newAccessToken}`;
+      return request;
     }
+    request.headers.Authorization = `Bearer ${accessToken}`;
 
     return request;
   },
   (error) => {
     return Promise.reject(error);
-  },
+  }
 );
 
 axios.interceptors.response.use(
   (response) => {
-    // Edit response config
     return response.data;
   },
   (error) => {
     return Promise.reject(
       axios.isAxiosError(error)
-        ? error.response?.data.data.message
-        : "An error occurred",
+        ? error.response?.data.data?.message
+        : "An error occurred"
     );
-  },
+  }
 );
 
 let AxiosClient = axios;

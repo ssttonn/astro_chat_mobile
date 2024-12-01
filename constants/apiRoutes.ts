@@ -7,5 +7,7 @@ export const APIRoutes = {
   refreshToken: "/auth/refresh-token",
   getProfile: "/profile/me",
   updateProfile: "/profile/me",
-  getConversations: "/chat/conversations",
+  getConversations: "/chat/conversation/me",
+  getConversationMessages: (conversationId: string) =>
+    `/chat/conversation/${conversationId}/messages`,
 };

@@ -1,8 +1,9 @@
 import { View, Text } from "react-native";
-import React, { memo, useCallback } from "react";
+import React, { memo, useCallback, useMemo } from "react";
 import IConversation from "@/business/data/models/IConversation";
 import Clickable from "../common/Clickable";
 import UserAvatar from "../common/UserAvatar";
+import moment from "moment";
 
 interface ConversationItemProps {
   conversation: IConversation;
@@ -10,6 +11,17 @@ interface ConversationItemProps {
 }
 
 const ConversationItem = ({ onPress, conversation }: ConversationItemProps) => {
+  const conversationName = useMemo(() => {
+    return (
+      conversation.name ||
+      conversation.members.map((m) => m.username).join(", ")
+    );
+  }, [conversation]);
+
+  const lastMessageTime = useMemo(() => {
+    return moment(conversation.lastMessage?.createdAt).format("HH:mm");
+  }, [conversation.lastMessage?.createdAt]);
+
   return (
     <Clickable
       onPress={useCallback(() => {
@@ -22,8 +34,11 @@ const ConversationItem = ({ onPress, conversation }: ConversationItemProps) => {
           size={80}
         />
         <View className="flex flex-col flex-1">
-          <Text className="text-xl font-KelsonBold text-dark-500">
-            {conversation.name}
+          <Text
+            className="text-xl font-KelsonBold text-dark-500"
+            numberOfLines={1}
+          >
+            {conversationName}
           </Text>
           <View className="flex flex-row gap-2">
             <Text numberOfLines={1} className="flex-1 text-lg font-KelsonLight">
@@ -32,7 +47,9 @@ const ConversationItem = ({ onPress, conversation }: ConversationItemProps) => {
           </View>
         </View>
         <View className="flex items-end gap-1">
-          <Text className="text-lg font-KelsonRegular">02:30</Text>
+          {/* <Text className="text-lg font-KelsonRegular">02:30</Text>
+           */}
+          <Text className="text-lg font-KelsonRegular">{lastMessageTime}</Text>
           <View className="bg-red-500 px-2 py-0.5 rounded-lg">
             <Text className="text-center font-KelsonBold text-white">99+</Text>
           </View>

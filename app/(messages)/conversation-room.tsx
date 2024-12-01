@@ -1,14 +1,20 @@
+import { conversationRoomActions } from "@/business/store/conversations/conversationRoomReducer";
+import { AppDispatch, RootState } from "@/business/store/redux/store";
 import Clickable from "@/components/common/Clickable";
 import UserAvatar from "@/components/common/UserAvatar";
 import ConversationRoomLayout from "@/components/conversation/ConversationRoomLayout";
 import { FontAwesome, FontAwesome5, Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import React, { useRef } from "react";
+import { router, useLocalSearchParams } from "expo-router";
+import React, { useEffect } from "react";
 import { Text, View } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 
-const ChatRoomScreen = () => {
+const ConversationRoomScreen = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { conversationId } = useLocalSearchParams();
+
   return (
-    <ConversationRoomLayout>
+    <ConversationRoomLayout conversationId={conversationId as string}>
       <View className="flex flex-row px-4 py-2 items-center gap-2">
         <Clickable
           className="bg-whiteGrey-300 rounded-full p-3"
@@ -38,4 +44,4 @@ const ChatRoomScreen = () => {
   );
 };
 
-export default ChatRoomScreen;
+export default ConversationRoomScreen;

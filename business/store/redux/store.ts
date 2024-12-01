@@ -1,13 +1,15 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { profileReducer } from "../profile/profileReducer";
 import { realtimeDataReducer } from "../realtime/realtimeDataReducer";
-import { conversationsReducer } from "../conversations/conversationsReducer";
+import { conversationListReducer } from "../conversations/conversationListReducer";
+import conversationRoomReducer from "../conversations/conversationRoomReducer";
 
 export const store = configureStore({
   reducer: {
     profile: profileReducer,
     realtimeData: realtimeDataReducer,
-    conversations: conversationsReducer,
+    conversations: conversationListReducer,
+    conversationRoom: conversationRoomReducer,
   },
 });
 

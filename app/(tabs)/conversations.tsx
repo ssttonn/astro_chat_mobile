@@ -1,4 +1,4 @@
-import { conversationsActions } from "@/business/store/conversations/conversationsReducer";
+import { conversationsActions } from "@/business/store/conversations/conversationListReducer";
 import { AppDispatch, RootState } from "@/business/store/redux/store";
 import Clickable from "@/components/common/Clickable";
 import ConversationItem from "@/components/conversation/ConversationItem";
@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 const ConversationsScreen = () => {
   const { conversations } = useSelector(
-    (state: RootState) => state.conversations,
+    (state: RootState) => state.conversations
   );
 
   const { currentUser } = useSelector((state: RootState) => state.profile);
@@ -42,7 +42,7 @@ const ConversationsScreen = () => {
   }, [connected, dispatch, currentUser]);
 
   const onConversationPress = useCallback((conversationId: string) => {
-    router.push(ScreenRoutes.conversationDetail);
+    router.push(ScreenRoutes.conversationDetail(conversationId));
   }, []);
 
   return (

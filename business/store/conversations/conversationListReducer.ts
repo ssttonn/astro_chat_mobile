@@ -1,49 +1,85 @@
 import IConversation, {
   ConversationType,
 } from "@/business/data/models/IConversation";
+import IMessage from "@/business/data/models/IMessage";
 import IPagination, {
   initialPagination,
 } from "@/business/data/models/IPagination";
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { AppDispatch } from "../redux/store";
 import { SocketIOClient } from "@/business/data/services/SocketIOClient";
 import AxiosClient from "@/business/data/services/axiosClient";
 import { APIRoutes } from "@/constants/apiRoutes";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { AppDispatch } from "../redux/store";
 
-export enum ConversationsStatus {
+export enum ConversationListStatus {
   IDLE = "idle",
   FETCHING = "fetching",
   REFRESHING = "refreshing",
   LOADING_MORE = "loading_more",
 }
 
-interface ConversationsState {
+interface ConversationListState {
   conversations: IPagination<IConversation>;
-  status: ConversationsStatus;
+  status: ConversationListStatus;
   errorMessage?: string;
 }
 
 const listenToSocketEvents = (userId: string) => {
   return async (dispatch: AppDispatch) => {
-    console.log("Listening to socket events", userId);
-    const listenResult = await SocketIOClient.emitWithAck(`conversation/user`, {
-      userId,
-    });
-
-    console.log("listenResult", listenResult);
+    const listenResult = await SocketIOClient.emitWithAck(
+      "conversationList/user",
+      {}
+    );
 
     if (!listenResult || !listenResult.success) {
       return;
     }
 
-    console.log("Listening to socket events");
+    SocketIOClient.on(
+      "conversationList/newConversation",
+      (conversation: IConversation) => {
+        dispatch(conversationsActions.addNewConversation(conversation));
+      }
+    );
 
-    SocketIOClient.on("conversation/new", (conversation: IConversation) => {
-      console.log("New conversation", conversation);
-      dispatch(conversationsActions.addNewConversation(conversation));
-    });
-    SocketIOClient.on("conversation/update", (conversation: IConversation) => {
-      console.log("Updated conversation", conversation);
+    SocketIOClient.on(
+      "conversationList/lastMessageChanged",
+      ({
+        conversationId,
+        message,
+      }: {
+        conversationId: string;
+        message: IMessage;
+      }) => {
+        dispatch(
+          conversationsActions.updateLastConversationMessage({
+            conversationId,
+            message,
+          })
+        );
+      }
+    );
+
+    SocketIOClient.on(
+      "conversationList/lastMessageDeleted",
+      ({
+        conversationId,
+        message,
+      }: {
+        conversationId: string;
+        message: IMessage;
+      }) => {
+        dispatch(
+          conversationsActions.updateLastConversationMessage({
+            conversationId,
+            message,
+          })
+        );
+      }
+    );
+
+    SocketIOClient.on("conversationList/newMessage", (message: IMessage) => {
+      dispatch(conversationsActions.newMessageReceived(message));
     });
   };
 };
@@ -56,7 +92,7 @@ const onFetchConversationsAsync = createAsyncThunk(
     } catch (error) {
       throw error;
     }
-  },
+  }
 );
 
 const onRefreshConversationsAsync = createAsyncThunk(
@@ -67,7 +103,7 @@ const onRefreshConversationsAsync = createAsyncThunk(
     } catch (error) {
       throw error;
     }
-  },
+  }
 );
 
 const onLoadMoreConversationsAsync = createAsyncThunk(
@@ -78,7 +114,7 @@ const onLoadMoreConversationsAsync = createAsyncThunk(
     } catch (error) {
       throw error;
     }
-  },
+  }
 );
 
 const fetchConversations = async (page: number, type?: ConversationType) => {
@@ -102,20 +138,53 @@ const fetchConversations = async (page: number, type?: ConversationType) => {
 
 const unlistenToSocketEvents = () => {
   return async () => {
-    SocketIOClient.off("conversation/new");
-    SocketIOClient.off("conversation/update");
+    SocketIOClient.off("conversationList/newConversation");
+    SocketIOClient.off("conversationList/lastMessageChanged");
+    SocketIOClient.off("conversationList/lastMessageDeleted");
+    SocketIOClient.off("conversationList/newMessage");
   };
 };
 
-const conversationSlice = createSlice({
-  name: "conversations",
+const conversationListSlice = createSlice({
+  name: "conversationList",
   initialState: {
     conversations: initialPagination<IConversation>(),
-    status: ConversationsStatus.IDLE,
-  } as ConversationsState,
+    status: ConversationListStatus.IDLE,
+  } as ConversationListState,
   reducers: {
     addNewConversation: (state, action) => {
       state.conversations.data.unshift(action.payload);
+    },
+    newMessageReceived: (state, action) => {
+      const conversation = state.conversations.data.find(
+        (c) => c.id === action.payload.conversationId
+      );
+
+      if (!conversation) {
+        return;
+      }
+
+      conversation.lastMessage = action.payload.message;
+
+      const conversationIndex = state.conversations.data.findIndex(
+        (c) => c.id === action.payload.conversationId
+      );
+
+      if (conversationIndex !== -1) {
+        state.conversations.data.splice(conversationIndex, 1);
+        state.conversations.data.unshift(conversation);
+      }
+    },
+    updateLastConversationMessage: (state, action) => {
+      const conversation = state.conversations.data.find(
+        (c) => c.id === action.payload.conversationId
+      );
+
+      if (!conversation) {
+        return;
+      }
+
+      conversation.lastMessage = action.payload.message;
     },
     setConversations: (state, action) => {
       state.conversations = action.payload;
@@ -129,35 +198,35 @@ const conversationSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(onFetchConversationsAsync.pending, (state) => {
-      state.status = ConversationsStatus.FETCHING;
+      state.status = ConversationListStatus.FETCHING;
     });
 
     builder.addCase(onFetchConversationsAsync.fulfilled, (state, action) => {
       state.conversations = action.payload;
-      state.status = ConversationsStatus.IDLE;
+      state.status = ConversationListStatus.IDLE;
     });
 
     builder.addCase(onFetchConversationsAsync.rejected, (state, action) => {
-      state.status = ConversationsStatus.IDLE;
+      state.status = ConversationListStatus.IDLE;
       state.errorMessage = action.error.message;
     });
 
     builder.addCase(onRefreshConversationsAsync.pending, (state) => {
-      state.status = ConversationsStatus.REFRESHING;
+      state.status = ConversationListStatus.REFRESHING;
     });
 
     builder.addCase(onRefreshConversationsAsync.fulfilled, (state, action) => {
       state.conversations = action.payload;
-      state.status = ConversationsStatus.IDLE;
+      state.status = ConversationListStatus.IDLE;
     });
 
     builder.addCase(onRefreshConversationsAsync.rejected, (state, action) => {
-      state.status = ConversationsStatus.IDLE;
+      state.status = ConversationListStatus.IDLE;
       state.errorMessage = action.error.message;
     });
 
     builder.addCase(onLoadMoreConversationsAsync.pending, (state) => {
-      state.status = ConversationsStatus.LOADING_MORE;
+      state.status = ConversationListStatus.LOADING_MORE;
     });
 
     builder.addCase(onLoadMoreConversationsAsync.fulfilled, (state, action) => {
@@ -167,18 +236,18 @@ const conversationSlice = createSlice({
         totalItems: action.payload.totalItems,
         data: [...state.conversations.data, ...action.payload.data],
       };
-      state.status = ConversationsStatus.IDLE;
+      state.status = ConversationListStatus.IDLE;
     });
 
     builder.addCase(onLoadMoreConversationsAsync.rejected, (state, action) => {
-      state.status = ConversationsStatus.IDLE;
+      state.status = ConversationListStatus.IDLE;
       state.errorMessage = action.error.message;
     });
   },
 });
 
 export const conversationsActions = {
-  ...conversationSlice.actions,
+  ...conversationListSlice.actions,
   listenToSocketEvents,
   unlistenToSocketEvents,
   onFetchConversationsAsync,
@@ -186,4 +255,4 @@ export const conversationsActions = {
   onLoadMoreConversationsAsync,
 };
 
-export const conversationsReducer = conversationSlice.reducer;
+export const conversationListReducer = conversationListSlice.reducer;

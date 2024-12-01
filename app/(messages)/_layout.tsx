@@ -8,7 +8,7 @@ const MessageLayout = () => {
         headerShown: false,
       }}
     >
-      <Stack.Screen name="conversation-detail" />
+      <Stack.Screen name="conversation-room" />
       <Stack.Screen name="new-conversation" />
     </Stack>
   );
