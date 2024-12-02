@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { Keyboard, TouchableOpacity } from "react-native";
 
 export interface ClickableProps {
@@ -31,4 +31,4 @@ const Clickable = ({
   );
 };
 
-export default Clickable;
+export default memo(Clickable);

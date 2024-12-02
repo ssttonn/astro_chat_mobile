@@ -1,18 +1,17 @@
+import { conversationChatActions } from "@/business/store/conversations/conversationChatReducer";
+import { conversationMessagesActions } from "@/business/store/conversations/conversationMessagesReducer";
+import { AppDispatch, RootState } from "@/business/store/redux/store";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import {
   FlatList,
   KeyboardAvoidingView,
   SafeAreaView,
-  Text,
   View,
 } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 import Clickable from "../common/Clickable";
 import MainTextField from "../common/MainTextField";
-import UserAvatar from "../common/UserAvatar";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/business/store/redux/store";
-import { conversationRoomActions } from "@/business/store/conversations/conversationRoomReducer";
 import MessageItem from "./MessageItem";
 
 interface ConversationRoomLayoutProps {
@@ -31,28 +30,53 @@ const ConversationRoomLayout = ({
   const dispatch = useDispatch<AppDispatch>();
 
   const { messages } = useSelector(
-    (state: RootState) => state.conversationRoom
+    (state: RootState) => state.conversationMessages
   );
 
   const { currentUser } = useSelector((state: RootState) => state.profile);
+  const { conversation } = useSelector(
+    (state: RootState) => state.conversationRoom
+  );
+
+  const { inputMessage } = useSelector(
+    (state: RootState) => state.conversationChat
+  );
 
   useEffect(() => {
     if (!conversationId) {
       return;
     }
     dispatch(
-      conversationRoomActions.onFetchMessagesAsync(conversationId as string)
+      conversationMessagesActions.onFetchMessagesAsync(conversationId as string)
     );
 
-    dispatch(conversationRoomActions.listenToSocketEvents(conversationId));
-
     return () => {
-      dispatch(conversationRoomActions.reset());
-      dispatch(
-        conversationRoomActions.unlistenToSocketEvents(conversationId as string)
-      );
+      dispatch(conversationMessagesActions.reset());
     };
   }, [conversationId, dispatch]);
+
+  const memberIds = useMemo(() => {
+    return conversation?.members
+      .map((member) => member.id)
+      .filter((id) => id !== currentUser?.id);
+  }, [conversation, currentUser]);
+
+  const onSendMessage = useCallback(() => {
+    if (!memberIds) return;
+    dispatch(
+      conversationChatActions.onSendMessage({
+        receiverIds: memberIds,
+        content: inputMessage,
+      })
+    );
+  }, [dispatch, inputMessage, memberIds]);
+
+  const onChangeMessageInput = useCallback(
+    (text: string) => {
+      dispatch(conversationChatActions.setInputMessage(text));
+    },
+    [dispatch]
+  );
 
   return (
     <SafeAreaView className="bg-white flex-1">
@@ -77,9 +101,17 @@ const ConversationRoomLayout = ({
             <Ionicons name="add" size={24} />
           </Clickable>
           <View className="flex-1">
-            <MainTextField label="Type your message here" type="text" />
+            <MainTextField
+              label="Type your message here"
+              type="text"
+              value={inputMessage}
+              onChangeText={onChangeMessageInput}
+            />
           </View>
-          <Clickable className="bg-whiteGrey-300 rounded-full p-3">
+          <Clickable
+            className="bg-whiteGrey-300 rounded-full p-3"
+            onPress={onSendMessage}
+          >
             <Ionicons name="send" size={24} color="#247cff" />
           </Clickable>
         </View>

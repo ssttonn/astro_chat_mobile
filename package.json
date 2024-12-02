@@ -10,6 +10,7 @@
     "web": "expo start --web",
     "test": "jest --watchAll",
     "lint": "expo lint",
+    "dev": "npx expo start -c",
     "android:internal": "fastlane android internal",
     "android:beta": "fastlane android beta",
     "android:alpha": "fastlane android alpha",

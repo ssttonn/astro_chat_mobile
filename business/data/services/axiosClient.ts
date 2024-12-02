@@ -7,11 +7,7 @@ axios.interceptors.request.use(
   async (request) => {
     // Edit request config
 
-    if (!request.headers["AuthRoutes"]) {
-      return request;
-    }
-
-    const accessToken = await SecureStore.getItemAsync(DBKey.ACCESS_TOKEN);
+    let accessToken = await SecureStore.getItemAsync(DBKey.ACCESS_TOKEN);
     let refreshToken: any = await SecureStore.getItemAsync(DBKey.REFRESH_TOKEN);
     const accessTokenExpiryDate = await SecureStore.getItemAsync(
       DBKey.ACCESS_TOKEN_EXPIRY_DATE
@@ -19,17 +15,28 @@ axios.interceptors.request.use(
     const refreshTokenExpiryDate = await SecureStore.getItemAsync(
       DBKey.REFRESH_TOKEN_EXPIRY_DATE
     );
-    if (
-      accessToken &&
-      accessTokenExpiryDate &&
+
+    if (!accessToken || !accessTokenExpiryDate) {
+      return request;
+    }
+
+    const hasAccessTokenExpired = !(
       new Date(accessTokenExpiryDate) > new Date()
-    ) {
-      request.headers.Authorization = `Bearer ${accessToken}`;
-    } else if (
-      refreshToken &&
-      refreshTokenExpiryDate &&
-      new Date(refreshTokenExpiryDate) > new Date()
-    ) {
+    );
+
+    if (hasAccessTokenExpired) {
+      if (!refreshToken || !refreshTokenExpiryDate) {
+        return request;
+      }
+
+      const hasRefreshTokenExpired = !(
+        new Date(refreshTokenExpiryDate) > new Date()
+      );
+
+      if (hasRefreshTokenExpired) {
+        return request;
+      }
+
       // Call refresh token API
       const response = await AxiosClient.post(APIRoutes.refreshToken, {
         refreshToken,
@@ -55,9 +62,9 @@ axios.interceptors.request.use(
         ),
       ]);
 
-      request.headers.Authorization = `Bearer ${newAccessToken}`;
-      return request;
+      accessToken = newAccessToken;
     }
+
     request.headers.Authorization = `Bearer ${accessToken}`;
 
     return request;

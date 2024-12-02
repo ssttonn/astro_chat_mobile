@@ -16,14 +16,10 @@ export interface ProfileState {
 const getCurrentProfile = createAsyncThunk<IUser>(
   "profile/getCurrentProfile",
   async () => {
-    let responseData = await AxiosClient.get(APIRoutes.getProfile, {
-      headers: {
-        AuthRoutes: true,
-      },
-    });
+    let responseData = await AxiosClient.get(APIRoutes.getProfile);
 
     return responseData.data;
-  },
+  }
 );
 
 const profileSlice = createSlice({

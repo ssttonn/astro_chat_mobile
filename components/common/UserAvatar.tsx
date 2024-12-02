@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { Image } from "react-native";
 
 interface UserAvatarProps {
@@ -21,4 +21,4 @@ const UserAvatar = ({ size, avatarUrl, className }: UserAvatarProps) => {
   );
 };
 
-export default UserAvatar;
+export default memo(UserAvatar);

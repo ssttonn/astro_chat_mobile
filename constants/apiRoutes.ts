@@ -10,4 +10,10 @@ export const APIRoutes = {
   getConversations: "/chat/conversation/me",
   getConversationMessages: (conversationId: string) =>
     `/chat/conversation/${conversationId}/messages`,
+  fetchConversation: (conversationId: string) =>
+    `/chat/conversation/${conversationId}`,
+  sendMessage: "/chat/conversation/message",
+  editMessage: (messageId: string) => `/chat/conversation/message/${messageId}`,
+  deleteMessage: (messageId: string) =>
+    `/chat/conversation/message/${messageId}`,
 };

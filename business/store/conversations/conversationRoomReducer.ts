@@ -1,29 +1,27 @@
-import IMessage from "@/business/data/models/IMessage";
-import IPagination, {
-  initialPagination,
-} from "@/business/data/models/IPagination";
 import { SocketIOClient } from "@/business/data/services/SocketIOClient";
+import { AppDispatch } from "../redux/store";
+import { conversationMessagesActions } from "./conversationMessagesReducer";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import IMessage from "@/business/data/models/IMessage";
+import IConversation from "@/business/data/models/IConversation";
 import AxiosClient from "@/business/data/services/axiosClient";
 import { APIRoutes } from "@/constants/apiRoutes";
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { AppDispatch } from "../redux/store";
 
 export enum ConversationRoomStatus {
-  IDLE = "IDLE",
-  FETCHING = "FETCHING",
-  REFRESHING = "REFRESHING",
-  LOADING_MORE = "LOADING_MORE",
+  IDLE = "idle",
+  FETCHING = "fetching",
 }
 
 interface ConversationRoomState {
-  messages: IPagination<IMessage>;
   status: ConversationRoomStatus;
+  typingUserIds: string[];
+  conversation?: IConversation;
   errorMessage?: string;
 }
 
 const initialState: ConversationRoomState = {
-  messages: initialPagination<IMessage>(),
   status: ConversationRoomStatus.IDLE,
+  typingUserIds: [],
   errorMessage: "",
 };
 
@@ -33,18 +31,16 @@ const listenToSocketEvents = (conversationId: string) => {
       conversationId,
     });
 
-    console.log("listenResult", listenResult);
     if (!listenResult || !listenResult.success) {
       return;
     }
 
     SocketIOClient.on("conversation/newMessage", (message: IMessage) => {
-      console.log("new message", message);
-      dispatch(conversationRoomActions.addNewMessage(message));
+      dispatch(conversationMessagesActions.addNewMessage(message));
     });
 
     SocketIOClient.on("conversation/messageUpdated", (message: IMessage) => {
-      dispatch(conversationRoomActions.updateMessage(message));
+      dispatch(conversationMessagesActions.updateMessage(message));
     });
 
     SocketIOClient.on("conversation/messageDeleted", (messageId: string) => {});
@@ -62,158 +58,54 @@ const unlistenToSocketEvents = (conversationId: string) => {
   };
 };
 
-const onFetchMessagesAsync = createAsyncThunk(
-  "conversationRoom/fetchMessages",
+const fetchConversationDetail = createAsyncThunk<IConversation, string>(
+  "conversation/fetchUserDetail",
   async (conversationId: string) => {
     try {
-      return await fetchMessages(1, conversationId);
+      console.log("Fetching");
+      const response = await AxiosClient.get(
+        APIRoutes.fetchConversation(conversationId)
+      );
+
+      return response.data;
     } catch (error) {
       throw error;
     }
   }
 );
-
-const onRefreshMessagesAsync = createAsyncThunk(
-  "conversationRoom/refreshMessages",
-  async (conversationId: string) => {
-    try {
-      return await fetchMessages(1, conversationId);
-    } catch (error) {
-      throw error;
-    }
-  }
-);
-
-const onLoadMoreMessagesAsync = createAsyncThunk(
-  "conversationRoom/loadMoreMessages",
-  async ({
-    page,
-    conversationId,
-  }: {
-    page: number;
-    conversationId: string;
-  }) => {
-    try {
-      return await fetchMessages(page, conversationId);
-    } catch (error) {
-      throw error;
-    }
-  }
-);
-
-const fetchMessages = async (
-  page: number,
-  conversationId: string
-): Promise<IPagination<IMessage>> => {
-  try {
-    const response = await AxiosClient.get(
-      APIRoutes.getConversationMessages(conversationId),
-
-      {
-        headers: {
-          AuthRoutes: true,
-        },
-        params: {
-          page,
-          limit: 100,
-        },
-      }
-    );
-
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
 
 const conversationRoomSlice = createSlice({
   name: "conversationRoom",
   initialState,
   reducers: {
-    addNewMessage: (state, action) => {
-      state.messages = {
-        ...state.messages,
-        data: [action.payload, ...state.messages.data],
-        totalItems: state.messages.totalItems + 1,
-      };
+    setConversation: (state, action: PayloadAction<IConversation>) => {
+      state.conversation = action.payload;
     },
-    updateMessage: (state, action) => {
-      const updatedMessage = action.payload;
 
-      state.messages = {
-        ...state.messages,
-        data: state.messages.data.map((m) =>
-          m.id === updatedMessage.id ? updatedMessage : m
-        ),
-      };
-    },
-    setMessages: (state, action) => {
-      state.messages = action.payload;
-    },
-    setStatus: (state, action) => {
-      state.status = action.payload;
-    },
-    setErrorMessage: (state, action) => {
-      state.errorMessage = action.payload;
-    },
     reset: (state) => {
-      state = {
-        ...initialState,
-      };
+      state = initialState;
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(onFetchMessagesAsync.pending, (state) => {
+    builder.addCase(fetchConversationDetail.fulfilled, (state, action) => {
+      state.status = ConversationRoomStatus.IDLE;
+      state.conversation = action.payload;
+    });
+    builder.addCase(fetchConversationDetail.rejected, (state, action) => {
+      state.status = ConversationRoomStatus.IDLE;
+      state.errorMessage = action.error.message;
+    });
+    builder.addCase(fetchConversationDetail.pending, (state) => {
       state.status = ConversationRoomStatus.FETCHING;
-    });
-    builder.addCase(onFetchMessagesAsync.fulfilled, (state, action) => {
-      state.messages = action.payload;
-      state.status = ConversationRoomStatus.IDLE;
-    });
-    builder.addCase(onFetchMessagesAsync.rejected, (state, action) => {
-      state.status = ConversationRoomStatus.IDLE;
-      state.errorMessage = action.error.message;
-    });
-
-    builder.addCase(onRefreshMessagesAsync.pending, (state) => {
-      state.status = ConversationRoomStatus.REFRESHING;
-    });
-    builder.addCase(onRefreshMessagesAsync.fulfilled, (state, action) => {
-      state.messages = action.payload;
-      state.status = ConversationRoomStatus.IDLE;
-    });
-    builder.addCase(onRefreshMessagesAsync.rejected, (state, action) => {
-      state.status = ConversationRoomStatus.IDLE;
-      console.log(action.error);
-      state.errorMessage = action.error.message;
-    });
-
-    builder.addCase(onLoadMoreMessagesAsync.pending, (state) => {
-      state.status = ConversationRoomStatus.LOADING_MORE;
-    });
-    builder.addCase(onLoadMoreMessagesAsync.fulfilled, (state, action) => {
-      state.messages = {
-        ...state.messages,
-        data: [...state.messages.data, ...action.payload.data],
-        currentPage: action.payload.currentPage,
-        totalItems: action.payload.totalItems,
-      };
-      state.status = ConversationRoomStatus.IDLE;
-    });
-    builder.addCase(onLoadMoreMessagesAsync.rejected, (state, action) => {
-      state.status = ConversationRoomStatus.IDLE;
-      state.errorMessage = action.error.message;
     });
   },
 });
 
 export const conversationRoomActions = {
-  ...conversationRoomSlice.actions,
   listenToSocketEvents,
   unlistenToSocketEvents,
-  onFetchMessagesAsync,
-  onRefreshMessagesAsync,
-  onLoadMoreMessagesAsync,
+  fetchConversationDetail,
+  ...conversationRoomSlice.actions,
 };
 
 export default conversationRoomSlice.reducer;

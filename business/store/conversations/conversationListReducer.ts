@@ -121,9 +121,6 @@ const fetchConversations = async (page: number, type?: ConversationType) => {
   try {
     // Fetch conversations from the server
     let responseData = await AxiosClient.get(APIRoutes.getConversations, {
-      headers: {
-        AuthRoutes: true,
-      },
       params: {
         page: page,
         type,
