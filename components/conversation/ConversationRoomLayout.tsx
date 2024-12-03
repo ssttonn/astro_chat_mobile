@@ -85,36 +85,43 @@ const ConversationRoomLayout = ({
   const onRetrySendMessage = useCallback(
     (message: IMessage) => {
       if (!memberIds || !currentUser) return;
-      showActionSheetWithOptions(
-        {
-          options: ["Retry", "Delete", "Cancel"],
-          cancelButtonIndex: 2,
-          destructiveButtonIndex: 1,
-        },
-        (buttonIndex) => {
-          if (buttonIndex === MessageAction.delete) {
-            dispatch(conversationChatActions.onDeleteMessage(message.id));
-          } else if (buttonIndex === MessageAction.edit) {
-            dispatch(
-              conversationChatActions.onEditMessage({
-                messageId: message.id,
-                content: message.content,
-              })
-            );
-          }
-        }
+      dispatch(
+        conversationChatActions.onRetryToSendMessage({
+          trackingId: message.id,
+          currentUser: currentUser,
+          conversationId: message.conversationId,
+          receiverIds: memberIds,
+          content: message.content,
+        })
       );
     },
-    [dispatch, showActionSheetWithOptions, memberIds, currentUser]
+    [dispatch, memberIds, currentUser]
   );
 
   const onClickMessage = useCallback(
     (message: IMessage) => {
-      if (message.messageState === "error") {
-        onRetrySendMessage(message);
-      }
+      console.log("Clicked message", message);
+      showActionSheetWithOptions(
+        {
+          options: ["Edit", "Delete", "Reply", "Cancel"],
+          cancelButtonIndex: 3,
+          destructiveButtonIndex: 1,
+        },
+        (buttonIndex) => {
+          switch (buttonIndex) {
+            case MessageAction.edit:
+              break;
+            case MessageAction.delete:
+              break;
+            case MessageAction.reply:
+              break;
+            default:
+              break;
+          }
+        }
+      );
     },
-    [onRetrySendMessage]
+    [showActionSheetWithOptions]
   );
 
   const onChangeMessageInput = useCallback(
