@@ -13,6 +13,14 @@ import { useDispatch, useSelector } from "react-redux";
 import Clickable from "../common/Clickable";
 import MainTextField from "../common/MainTextField";
 import MessageItem from "./MessageItem";
+import IMessage from "@/business/data/models/IMessage";
+import { useActionSheet } from "@expo/react-native-action-sheet";
+
+enum MessageAction {
+  edit,
+  delete,
+  reply,
+}
 
 interface ConversationRoomLayoutProps {
   conversationId?: string;
@@ -28,6 +36,7 @@ const ConversationRoomLayout = ({
   let listRef = useRef(null);
 
   const dispatch = useDispatch<AppDispatch>();
+  const { showActionSheetWithOptions } = useActionSheet();
 
   const { messages } = useSelector(
     (state: RootState) => state.conversationMessages
@@ -62,14 +71,51 @@ const ConversationRoomLayout = ({
   }, [conversation, currentUser]);
 
   const onSendMessage = useCallback(() => {
-    if (!memberIds) return;
+    if (!memberIds || !currentUser) return;
     dispatch(
       conversationChatActions.onSendMessage({
+        currentUser: currentUser,
+        conversationId: conversationId as string,
         receiverIds: memberIds,
         content: inputMessage,
       })
     );
-  }, [dispatch, inputMessage, memberIds]);
+  }, [dispatch, inputMessage, memberIds, conversationId, currentUser]);
+
+  const onRetrySendMessage = useCallback(
+    (message: IMessage) => {
+      if (!memberIds || !currentUser) return;
+      showActionSheetWithOptions(
+        {
+          options: ["Retry", "Delete", "Cancel"],
+          cancelButtonIndex: 2,
+          destructiveButtonIndex: 1,
+        },
+        (buttonIndex) => {
+          if (buttonIndex === MessageAction.delete) {
+            dispatch(conversationChatActions.onDeleteMessage(message.id));
+          } else if (buttonIndex === MessageAction.edit) {
+            dispatch(
+              conversationChatActions.onEditMessage({
+                messageId: message.id,
+                content: message.content,
+              })
+            );
+          }
+        }
+      );
+    },
+    [dispatch, showActionSheetWithOptions, memberIds, currentUser]
+  );
+
+  const onClickMessage = useCallback(
+    (message: IMessage) => {
+      if (message.messageState === "error") {
+        onRetrySendMessage(message);
+      }
+    },
+    [onRetrySendMessage]
+  );
 
   const onChangeMessageInput = useCallback(
     (text: string) => {
@@ -92,6 +138,8 @@ const ConversationRoomLayout = ({
           renderItem={(item) => (
             <MessageItem
               message={item.item}
+              onRetrySendMessage={onRetrySendMessage}
+              onClickMessage={onClickMessage}
               currentUserId={currentUser?.id ?? ""}
             />
           )}

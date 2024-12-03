@@ -1,24 +1,67 @@
 import { View, Text } from "react-native";
 import React, { memo, useMemo } from "react";
-import IMessage from "@/business/data/models/IMessage";
+import IMessage, { MessageState } from "@/business/data/models/IMessage";
 import UserAvatar from "../common/UserAvatar";
+import { ActivityIndicator } from "react-native";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import Clickable from "../common/Clickable";
 
 interface MessageItemProps {
   message: IMessage;
   currentUserId: string;
+  onClickMessage?: (message: IMessage) => void;
+  onRetrySendMessage?: (message: IMessage) => void;
 }
 
-const MessageItem = ({ message, currentUserId }: MessageItemProps) => {
+const MessageItem = ({
+  message,
+  currentUserId,
+  onClickMessage,
+  onRetrySendMessage,
+}: MessageItemProps) => {
   const isMe = useMemo(() => {
     return message.senderId.id === currentUserId;
   }, [message.senderId.id, currentUserId]);
 
   return isMe ? (
-    <View key={message.id} className="flex flex-row-reverse gap-2">
-      <View className="bg-blue-500 rounded-lg px-4 py-2 items-center max-w-[80%]">
-        <Text className="text-white font-KelsonBold text-lg">
-          {message.content}
+    <View className="flex items-end gap-1">
+      {message.messageState === MessageState.Error && (
+        <Text className="font-KelsonBold color-danger-500">
+          Can't send message, tap to retry
         </Text>
+      )}
+      <View
+        key={message.id}
+        className="flex flex-row-reverse gap-2 items-center"
+      >
+        <Clickable
+          className={`${message.messageState === MessageState.Sending ? "bg-whiteGrey-700" : "bg-blue-500"} rounded-lg px-4 py-2 items-center max-w-[80%]`}
+          onPress={() => {
+            if (
+              message.messageState === MessageState.Error &&
+              onRetrySendMessage
+            ) {
+              onRetrySendMessage(message);
+              return;
+            }
+
+            if (message.messageState === MessageState.Sending) {
+              return;
+            }
+
+            onClickMessage?.(message);
+          }}
+        >
+          <Text className="text-white font-KelsonBold text-lg">
+            {message.content}
+          </Text>
+        </Clickable>
+        {message.messageState === MessageState.Error && (
+          <MaterialIcons name="error" size={24} color="#F56565" />
+        )}
+        <ActivityIndicator
+          animating={message.messageState === MessageState.Sending}
+        />
       </View>
     </View>
   ) : (

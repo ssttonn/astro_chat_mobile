@@ -7,6 +7,12 @@ export enum MessageType {
   Audio = "audio",
 }
 
+export enum MessageState {
+  Sending = "sending",
+  Delivered = "delivered",
+  Error = "error",
+}
+
 interface IMessage {
   id: string;
   conversationId: string;
@@ -19,6 +25,7 @@ interface IMessage {
   seenBy: IUser[];
   createdAt: Date;
   updatedAt: Date;
+  messageState: MessageState;
 }
 
 export default IMessage;

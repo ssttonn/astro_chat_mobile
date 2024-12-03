@@ -1,4 +1,5 @@
 import IMessage from "@/business/data/models/IMessage";
+import IUser from "@/business/data/models/IUser";
 import AxiosClient from "@/business/data/services/axiosClient";
 import { APIRoutes } from "@/constants/apiRoutes";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
@@ -26,13 +27,22 @@ const initialState: ConversationChatState = {
 
 const onSendMessage = createAsyncThunk<
   IMessage,
-  { receiverIds: string[]; content: string }
+  {
+    conversationId: string;
+    currentUser: IUser;
+    receiverIds: string[];
+    content: string;
+  }
 >(
   "conversationChat/sendMessage",
   async ({
+    conversationId,
+    currentUser,
     receiverIds,
     content,
   }: {
+    conversationId: string;
+    currentUser: IUser;
     receiverIds: string[];
     content: string;
   }) => {
@@ -46,6 +56,43 @@ const onSendMessage = createAsyncThunk<
       return response.data;
     } catch (error) {
       console.log(error);
+      throw error;
+    }
+  }
+);
+
+const onRetryToSendMessage = createAsyncThunk<
+  IMessage,
+  {
+    trackingId: string;
+    conversationId: string;
+    currentUser: IUser;
+    receiverIds: string[];
+    content: string;
+  }
+>(
+  "conversationChat/retrySendMessage",
+  async ({
+    receiverIds,
+    content,
+  }: {
+    trackingId: string;
+    conversationId: string;
+    currentUser: IUser;
+    receiverIds: string[];
+    content: string;
+  }) => {
+    try {
+      const response = await AxiosClient.post(APIRoutes.sendMessage, {
+        receivers: receiverIds,
+        content: content,
+        type: "text",
+      });
+
+      console.log("Retry send message", response.data);
+
+      return response.data;
+    } catch (error) {
       throw error;
     }
   }
@@ -119,6 +166,7 @@ const conversationChatSlice = createSlice({
     });
     builder.addCase(onSendMessage.pending, (state) => {
       state.status = ConversationChatStatus.SENDING_MESSAGE;
+      state.inputMessage = "";
     });
     builder.addCase(onSendMessage.rejected, (state, action) => {
       state.status = ConversationChatStatus.IDLE;
@@ -151,6 +199,7 @@ export const conversationChatActions = {
   onSendMessage,
   onEditMessage,
   onDeleteMessage,
+  onRetryToSendMessage,
   ...conversationChatSlice.actions,
 };
 

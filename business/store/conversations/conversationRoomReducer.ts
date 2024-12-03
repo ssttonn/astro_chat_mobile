@@ -1,11 +1,12 @@
+import IConversation from "@/business/data/models/IConversation";
+import IMessage from "@/business/data/models/IMessage";
+import IUser from "@/business/data/models/IUser";
+import AxiosClient from "@/business/data/services/axiosClient";
 import { SocketIOClient } from "@/business/data/services/SocketIOClient";
+import { APIRoutes } from "@/constants/apiRoutes";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppDispatch } from "../redux/store";
 import { conversationMessagesActions } from "./conversationMessagesReducer";
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import IMessage from "@/business/data/models/IMessage";
-import IConversation from "@/business/data/models/IConversation";
-import AxiosClient from "@/business/data/services/axiosClient";
-import { APIRoutes } from "@/constants/apiRoutes";
 
 export enum ConversationRoomStatus {
   IDLE = "idle",
@@ -25,7 +26,7 @@ const initialState: ConversationRoomState = {
   errorMessage: "",
 };
 
-const listenToSocketEvents = (conversationId: string) => {
+const listenToSocketEvents = (conversationId: string, currentUser: IUser) => {
   return async (dispatch: AppDispatch) => {
     const listenResult = await SocketIOClient.emitWithAck("conversation/join", {
       conversationId,
@@ -36,6 +37,9 @@ const listenToSocketEvents = (conversationId: string) => {
     }
 
     SocketIOClient.on("conversation/newMessage", (message: IMessage) => {
+      if (message.senderId.id === currentUser.id) {
+        return;
+      }
       dispatch(conversationMessagesActions.addNewMessage(message));
     });
 

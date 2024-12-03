@@ -11,17 +11,24 @@ import { useDispatch, useSelector } from "react-redux";
 
 const ConversationRoomScreen = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const { currentUser } = useSelector((state: RootState) => state.profile);
   const { conversationId } = useLocalSearchParams();
   const { conversation } = useSelector(
     (state: RootState) => state.conversationRoom
   );
 
   useEffect(() => {
+    if (!conversationId || !currentUser) {
+      return;
+    }
     dispatch(
       conversationRoomActions.fetchConversationDetail(conversationId as string)
     );
     dispatch(
-      conversationRoomActions.listenToSocketEvents(conversationId as string)
+      conversationRoomActions.listenToSocketEvents(
+        conversationId as string,
+        currentUser
+      )
     );
 
     return () => {
@@ -30,7 +37,7 @@ const ConversationRoomScreen = () => {
         conversationRoomActions.unlistenToSocketEvents(conversationId as string)
       );
     };
-  }, [conversationId, dispatch]);
+  }, [conversationId, dispatch, currentUser]);
 
   const conversationName = useMemo(() => {
     return (

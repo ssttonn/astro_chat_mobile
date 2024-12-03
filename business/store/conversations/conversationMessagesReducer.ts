@@ -1,10 +1,14 @@
-import IMessage from "@/business/data/models/IMessage";
+import IMessage, {
+  MessageState,
+  MessageType,
+} from "@/business/data/models/IMessage";
 import IPagination, {
   initialPagination,
 } from "@/business/data/models/IPagination";
 import AxiosClient from "@/business/data/services/axiosClient";
 import { APIRoutes } from "@/constants/apiRoutes";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { conversationChatActions } from "./conversationChatReducer";
 
 export enum ConversationMessagesStatus {
   IDLE = "IDLE",
@@ -80,7 +84,13 @@ const fetchMessages = async (
       }
     );
 
-    return response.data;
+    return {
+      ...response.data,
+      data: response.data.data.map((message: IMessage) => ({
+        ...message,
+        messageState: MessageState.Delivered,
+      })),
+    };
   } catch (error) {
     throw error;
   }
@@ -164,6 +174,102 @@ const conversationMessageSlice = createSlice({
       state.status = ConversationMessagesStatus.IDLE;
       state.errorMessage = action.error.message;
     });
+
+    builder.addCase(
+      conversationChatActions.onSendMessage.pending,
+      (state, action) => {
+        const currentUser = action.meta.arg.currentUser;
+        const conversationId = action.meta.arg.conversationId;
+        state.messages = {
+          ...state.messages,
+          data: [
+            {
+              id: action.meta.requestId,
+              conversationId: conversationId,
+              content: action.meta.arg.content,
+              senderId: currentUser,
+              type: MessageType.Text,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              level: 0,
+              taggedUsers: [],
+              seenBy: [],
+              replies: [],
+              messageState: MessageState.Sending,
+            },
+            ...state.messages.data,
+          ],
+        };
+      }
+    );
+    builder.addCase(
+      conversationChatActions.onSendMessage.rejected,
+      (state, action) => {
+        const draftMessageIndex = state.messages.data.findIndex(
+          (m) => m.id === action.meta.requestId
+        );
+
+        if (draftMessageIndex !== -1) {
+          state.messages.data[draftMessageIndex].messageState =
+            MessageState.Error;
+        }
+      }
+    );
+    builder.addCase(
+      conversationChatActions.onSendMessage.fulfilled,
+      (state, action) => {
+        const newMessage = action.payload;
+        state.messages = {
+          ...state.messages,
+          data: state.messages.data.map((m) =>
+            m.id === action.meta.requestId ? newMessage : m
+          ),
+        };
+      }
+    );
+    builder.addCase(
+      conversationChatActions.onRetryToSendMessage.pending,
+      (state, action) => {
+        const trackingId = action.meta.arg.trackingId;
+        const draftMessageIndex = state.messages.data.findIndex(
+          (m) => m.id === trackingId
+        );
+
+        if (draftMessageIndex !== -1) {
+          state.messages.data[draftMessageIndex].messageState =
+            MessageState.Sending;
+        }
+      }
+    );
+
+    builder.addCase(
+      conversationChatActions.onRetryToSendMessage.rejected,
+      (state, action) => {
+        const trackingId = action.meta.arg.trackingId;
+        const draftMessageIndex = state.messages.data.findIndex(
+          (m) => m.id === trackingId
+        );
+
+        if (draftMessageIndex !== -1) {
+          state.messages.data[draftMessageIndex].messageState =
+            MessageState.Error;
+        }
+      }
+    );
+
+    builder.addCase(
+      conversationChatActions.onRetryToSendMessage.fulfilled,
+      (state, action) => {
+        const newMessage = action.payload;
+        const trackingId = action.meta.arg.trackingId;
+        state.messages = {
+          ...state.messages,
+          data: state.messages.data.map((m) =>
+            m.id === trackingId ? newMessage : m
+          ),
+        };
+      }
+    );
   },
 });
 

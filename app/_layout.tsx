@@ -8,6 +8,7 @@ import Toast, { ErrorToast, SuccessToast } from "react-native-toast-message";
 import "../global.css";
 import { Provider } from "react-redux";
 import { store } from "@/business/store/redux/store";
+import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -33,60 +34,62 @@ export default function RootLayout() {
   }
 
   return (
-    <Provider store={store}>
-      <Stack initialRouteName="(auth)" screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(auth)" />
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="(messages)" />
-      </Stack>
-      <StatusBar style="auto" />
-      <Toast
-        position="bottom"
-        config={{
-          success: (props) => (
-            <SuccessToast
-              {...props}
-              style={{
-                borderRadius: 20,
-                borderLeftWidth: 0,
-                // borderLeftColor: "#68D391",
-                // borderColor: "#68D391",
-                // borderWidth: 2,
-              }}
-              text2Style={{
-                fontSize: 15,
-                fontFamily: "KelsonBold",
-                color: "#68D391",
-                textAlign: "center",
-              }}
-              text2NumberOfLines={10}
-            />
-          ),
-          /*
+    <ActionSheetProvider>
+      <Provider store={store}>
+        <Stack initialRouteName="(auth)" screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(auth)" />
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="(messages)" />
+        </Stack>
+        <StatusBar style="auto" />
+        <Toast
+          position="bottom"
+          config={{
+            success: (props) => (
+              <SuccessToast
+                {...props}
+                style={{
+                  borderRadius: 20,
+                  borderLeftWidth: 0,
+                  // borderLeftColor: "#68D391",
+                  // borderColor: "#68D391",
+                  // borderWidth: 2,
+                }}
+                text2Style={{
+                  fontSize: 15,
+                  fontFamily: "KelsonBold",
+                  color: "#68D391",
+                  textAlign: "center",
+                }}
+                text2NumberOfLines={10}
+              />
+            ),
+            /*
             Overwrite 'error' type,
             by modifying the existing `ErrorToast` component
           */
-          error: (props) => (
-            <ErrorToast
-              {...props}
-              style={{
-                borderRadius: 20,
-                borderLeftWidth: 0,
-                // borderLeftColor: "#FC8181",
-                // borderColor: "#FC8181",
-                // borderWidth: 2,
-              }}
-              text2Style={{
-                fontSize: 15,
-                fontFamily: "KelsonBold",
-                color: "#FC8181",
-                textAlign: "center",
-              }}
-              text2NumberOfLines={10}
-            />
-          ),
-        }}
-      />
-    </Provider>
+            error: (props) => (
+              <ErrorToast
+                {...props}
+                style={{
+                  borderRadius: 20,
+                  borderLeftWidth: 0,
+                  // borderLeftColor: "#FC8181",
+                  // borderColor: "#FC8181",
+                  // borderWidth: 2,
+                }}
+                text2Style={{
+                  fontSize: 15,
+                  fontFamily: "KelsonBold",
+                  color: "#FC8181",
+                  textAlign: "center",
+                }}
+                text2NumberOfLines={10}
+              />
+            ),
+          }}
+        />
+      </Provider>
+    </ActionSheetProvider>
   );
 }

@@ -28,24 +28,24 @@ const NewConversationScreen = () => {
           width: number,
           height: number,
           px: number,
-          py: number,
+          py: number
         ) => {
           const newTopPosition = py + height;
 
           if (newTopPosition !== topPosition) setTopPosition(newTopPosition);
-        },
+        }
       );
     }
   }, [isSearching, topPosition]);
 
   const addNewUserIcon = useMemo(
     () => <MaterialCommunityIcons name="plus" size={24} color="#247cff" />,
-    [],
+    []
   );
 
   const backIcon = useMemo(
     () => <Ionicons name="chevron-back" size={24} />,
-    [],
+    []
   );
 
   const accountSearchIcon = useMemo(
@@ -57,7 +57,7 @@ const NewConversationScreen = () => {
         color="#247cff"
       />
     ),
-    [],
+    []
   );
 
   const onSearchFocus = useCallback(() => {
@@ -108,7 +108,7 @@ const NewConversationScreen = () => {
                   />
                 </Clickable>
               </View>
-            ),
+            )
           )}
         </View>
       </View>
@@ -140,7 +140,7 @@ const NewConversationScreen = () => {
                 {addNewUserIcon}
               </CircularIcon>
             </View>
-          ),
+          )
         )}
       </View>
     </>
