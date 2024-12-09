@@ -1,4 +1,7 @@
-import { conversationChatActions } from "@/business/store/conversations/conversationChatReducer";
+import {
+  conversationChatActions,
+  ConversationChatStatus,
+} from "@/business/store/conversations/conversationChatReducer";
 import { conversationMessagesActions } from "@/business/store/conversations/conversationMessagesReducer";
 import { AppDispatch, RootState } from "@/business/store/redux/store";
 import { Ionicons } from "@expo/vector-icons";
@@ -8,6 +11,7 @@ import {
   KeyboardAvoidingView,
   SafeAreaView,
   View,
+  Text,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import Clickable from "../common/Clickable";
@@ -33,7 +37,7 @@ const ConversationRoomLayout = ({
   onSend,
   conversationId,
 }: ConversationRoomLayoutProps) => {
-  let listRef = useRef(null);
+  let listRef = useRef<any>(null);
 
   const dispatch = useDispatch<AppDispatch>();
   const { showActionSheetWithOptions } = useActionSheet();
@@ -47,7 +51,7 @@ const ConversationRoomLayout = ({
     (state: RootState) => state.conversationRoom
   );
 
-  const { inputMessage } = useSelector(
+  const { inputMessage, status, editingMessageId } = useSelector(
     (state: RootState) => state.conversationChat
   );
 
@@ -61,6 +65,7 @@ const ConversationRoomLayout = ({
 
     return () => {
       dispatch(conversationMessagesActions.reset());
+      dispatch(conversationChatActions.reset());
     };
   }, [conversationId, dispatch]);
 
@@ -70,8 +75,19 @@ const ConversationRoomLayout = ({
       .filter((id) => id !== currentUser?.id);
   }, [conversation, currentUser]);
 
-  const onSendMessage = useCallback(() => {
+  const onClickSendMessage = useCallback(() => {
     if (!memberIds || !currentUser) return;
+
+    if (editingMessageId) {
+      dispatch(
+        conversationChatActions.onEditMessage({
+          content: inputMessage,
+          messageId: editingMessageId,
+        })
+      );
+      return;
+    }
+
     dispatch(
       conversationChatActions.onSendMessage({
         currentUser: currentUser,
@@ -80,7 +96,14 @@ const ConversationRoomLayout = ({
         content: inputMessage,
       })
     );
-  }, [dispatch, inputMessage, memberIds, conversationId, currentUser]);
+  }, [
+    dispatch,
+    inputMessage,
+    memberIds,
+    conversationId,
+    currentUser,
+    editingMessageId,
+  ]);
 
   const onRetrySendMessage = useCallback(
     (message: IMessage) => {
@@ -103,17 +126,22 @@ const ConversationRoomLayout = ({
       console.log("Clicked message", message);
       showActionSheetWithOptions(
         {
-          options: ["Edit", "Delete", "Reply", "Cancel"],
+          options: ["Edit", "Delete", "Cancel"],
           cancelButtonIndex: 3,
           destructiveButtonIndex: 1,
         },
         (buttonIndex) => {
           switch (buttonIndex) {
             case MessageAction.edit:
+              dispatch(
+                conversationChatActions.setEditingMessage({
+                  messageId: message.id,
+                  content: message.content,
+                })
+              );
               break;
             case MessageAction.delete:
-              break;
-            case MessageAction.reply:
+              dispatch(conversationChatActions.onDeleteMessage(message.id));
               break;
             default:
               break;
@@ -121,7 +149,7 @@ const ConversationRoomLayout = ({
         }
       );
     },
-    [showActionSheetWithOptions]
+    [showActionSheetWithOptions, dispatch]
   );
 
   const onChangeMessageInput = useCallback(
@@ -130,6 +158,21 @@ const ConversationRoomLayout = ({
     },
     [dispatch]
   );
+
+  const isSendButtonEnabled = useMemo(() => {
+    return inputMessage && status === ConversationChatStatus.IDLE;
+  }, [inputMessage, status]);
+
+  useEffect(() => {
+    let index = messages.data.findIndex(
+      (message) => message.id === editingMessageId
+    );
+
+    if (index === -1) {
+      return;
+    }
+    listRef?.current.scrollToIndex({ animated: true, index: index });
+  }, [editingMessageId, messages]);
 
   return (
     <SafeAreaView className="bg-white flex-1">
@@ -142,33 +185,69 @@ const ConversationRoomLayout = ({
           keyboardShouldPersistTaps="handled"
           inverted
           data={messages.data}
+          onScrollToIndexFailed={(info) => {
+            const wait = new Promise((resolve) => setTimeout(resolve, 500));
+            wait.then(() => {
+              listRef?.current?.scrollToIndex({
+                index: info.index,
+                animated: true,
+              });
+            });
+          }}
           renderItem={(item) => (
             <MessageItem
+              key={item.item.id}
               message={item.item}
+              isEditing={item.item.id === editingMessageId}
               onRetrySendMessage={onRetrySendMessage}
               onClickMessage={onClickMessage}
               currentUserId={currentUser?.id ?? ""}
             />
           )}
         />
-        <View className="flex flex-row items-center gap-2 p-4 bg-white">
-          <Clickable className="bg-whiteGrey-300 rounded-full p-3">
-            <Ionicons name="add" size={24} />
-          </Clickable>
-          <View className="flex-1">
-            <MainTextField
-              label="Type your message here"
-              type="text"
-              value={inputMessage}
-              onChangeText={onChangeMessageInput}
-            />
-          </View>
-          <Clickable
-            className="bg-whiteGrey-300 rounded-full p-3"
-            onPress={onSendMessage}
+
+        <View className="flex rounded-lg">
+          <View
+            className={`flex-row p-4 justify-between items-center ${editingMessageId ? "flex" : "hidden"}`}
           >
-            <Ionicons name="send" size={24} color="#247cff" />
-          </Clickable>
+            <Text>Edit message</Text>
+            <Clickable
+              className="flex bg-whiteGrey-300 rounded-full items-center justify-center"
+              onPress={useCallback(() => {
+                dispatch(conversationChatActions.setEditingMessage({}));
+              }, [dispatch])}
+            >
+              {useMemo(() => {
+                return <Ionicons name="close" size={30} />;
+              }, [])}
+            </Clickable>
+          </View>
+          <View className="flex flex-row items-center gap-2 p-4">
+            <Clickable className="bg-whiteGrey-300 rounded-full p-3">
+              {useMemo(() => {
+                return <Ionicons name="menu" size={24} />;
+              }, [])}
+            </Clickable>
+            <View className="flex-1">
+              <MainTextField
+                label="Type your message here"
+                type="text"
+                value={inputMessage}
+                onChangeText={onChangeMessageInput}
+              />
+            </View>
+            <Clickable
+              className={`bg-whiteGrey-300 rounded-full p-3 ${isSendButtonEnabled ? "opacity-100" : "opacity-50"}`}
+              onPress={isSendButtonEnabled ? onClickSendMessage : undefined}
+            >
+              {useMemo(
+                () => (
+                  <Ionicons name="send" size={24} color="#247cff" />
+                ),
+                []
+              )}
+            </Clickable>
+          </View>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

@@ -25,6 +25,7 @@ interface IMessage {
   seenBy: IUser[];
   createdAt: Date;
   updatedAt: Date;
+  deletedAt?: Date;
   messageState: MessageState;
 }
 

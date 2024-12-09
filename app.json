@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.astro-chat-mobile"
+      "bundleIdentifier": "com.astrotify.AstroChat"
     },
     "android": {
       "adaptiveIcon": {

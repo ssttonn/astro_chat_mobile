@@ -9,6 +9,7 @@ import Clickable from "../common/Clickable";
 interface MessageItemProps {
   message: IMessage;
   currentUserId: string;
+  isEditing?: boolean;
   onClickMessage?: (message: IMessage) => void;
   onRetrySendMessage?: (message: IMessage) => void;
 }
@@ -18,10 +19,21 @@ const MessageItem = ({
   currentUserId,
   onClickMessage,
   onRetrySendMessage,
+  isEditing,
 }: MessageItemProps) => {
   const isMe = useMemo(() => {
     return message.senderId.id === currentUserId;
   }, [message.senderId.id, currentUserId]);
+
+  if (message.deletedAt) {
+    return (
+      <View className="flex self-end bg-white border-whiteGrey-500 border-2 rounded-lg px-4 py-2">
+        <Text className="text-whiteGrey-700 font-KelsonBold text-lg">
+          This message has been deleted
+        </Text>
+      </View>
+    );
+  }
 
   return isMe ? (
     <View className="flex items-end gap-1">
@@ -35,7 +47,7 @@ const MessageItem = ({
         className="flex flex-row-reverse gap-2 items-center"
       >
         <Clickable
-          className={`${message.messageState === MessageState.Sending ? "bg-whiteGrey-700" : "bg-blue-500"} rounded-lg px-4 py-2 items-center max-w-[80%]`}
+          className={`${message.messageState === MessageState.Sending ? "bg-whiteGrey-700" : "bg-blue-500"} ${isEditing ? "opacity-50" : "opacty-100"} rounded-lg px-4 py-2 items-center max-w-[80%]`}
           onPress={() => {
             if (
               message.messageState === MessageState.Error &&

@@ -127,9 +127,9 @@ const conversationMessageSlice = createSlice({
       state.errorMessage = action.payload;
     },
     reset: (state) => {
-      state = {
-        ...initialState,
-      };
+      state.errorMessage = "";
+      state.messages = initialPagination<IMessage>();
+      state.status = ConversationMessagesStatus.IDLE;
     },
   },
   extraReducers: (builder) => {

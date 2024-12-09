@@ -5,7 +5,7 @@ import UserAvatar from "@/components/common/UserAvatar";
 import ConversationRoomLayout from "@/components/conversation/ConversationRoomLayout";
 import { FontAwesome, FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -16,6 +16,7 @@ const ConversationRoomScreen = () => {
   const { conversation } = useSelector(
     (state: RootState) => state.conversationRoom
   );
+  const { connected } = useSelector((state: RootState) => state.realtimeData);
 
   useEffect(() => {
     if (!conversationId || !currentUser) {
@@ -24,20 +25,35 @@ const ConversationRoomScreen = () => {
     dispatch(
       conversationRoomActions.fetchConversationDetail(conversationId as string)
     );
-    dispatch(
-      conversationRoomActions.listenToSocketEvents(
-        conversationId as string,
-        currentUser
-      )
-    );
 
     return () => {
       dispatch(conversationRoomActions.reset());
+    };
+  }, [conversationId, dispatch, currentUser]);
+
+  useEffect(() => {
+    if (!conversationId || !currentUser) {
+      return;
+    }
+    if (connected) {
+      dispatch(
+        conversationRoomActions.listenToSocketEvents(
+          conversationId as string,
+          currentUser
+        )
+      );
+    } else {
+      dispatch(
+        conversationRoomActions.unlistenToSocketEvents(conversationId as string)
+      );
+    }
+
+    return () => {
       dispatch(
         conversationRoomActions.unlistenToSocketEvents(conversationId as string)
       );
     };
-  }, [conversationId, dispatch, currentUser]);
+  }, [connected, conversationId, currentUser, dispatch]);
 
   const conversationName = useMemo(() => {
     return (
@@ -48,7 +64,7 @@ const ConversationRoomScreen = () => {
 
   return (
     <ConversationRoomLayout conversationId={conversationId as string}>
-      <View className="flex flex-row px-4 py-2 items-center gap-2">
+      <View className="flex flex-row px-4 py-2 items-center gap-4">
         <Clickable
           className="bg-whiteGrey-300 rounded-full p-3"
           onPress={router.back}
@@ -72,7 +88,7 @@ const ConversationRoomScreen = () => {
           <FontAwesome5 name="video" size={26} color="#247cff" />
         </Clickable>
 
-        <Clickable className="ml-2">
+        <Clickable className="ml-2" onPress={useCallback(() => {}, [])}>
           <FontAwesome name="phone" size={26} color="#247cff" />
         </Clickable>
       </View>

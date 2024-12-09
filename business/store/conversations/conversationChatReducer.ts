@@ -14,6 +14,7 @@ export enum ConversationChatStatus {
 interface ConversationChatState {
   typingUserIds: string[];
   inputMessage: string;
+  editingMessageId?: string;
   status: ConversationChatStatus;
   errorMessage?: string;
 }
@@ -155,8 +156,21 @@ const conversationChatSlice = createSlice({
     setInputMessage: (state, action: PayloadAction<string>) => {
       state.inputMessage = action.payload;
     },
+    setEditingMessage: (
+      state,
+      action: PayloadAction<{
+        messageId?: string;
+        content?: string;
+      }>
+    ) => {
+      state.editingMessageId = action.payload.messageId;
+      state.inputMessage = action.payload.content || "";
+    },
     reset: (state) => {
-      state = initialState;
+      state.inputMessage = "";
+      state.status = ConversationChatStatus.IDLE;
+      state.errorMessage = "";
+      state.editingMessageId = undefined;
     },
   },
   extraReducers: (builder) => {
@@ -174,6 +188,8 @@ const conversationChatSlice = createSlice({
     });
     builder.addCase(onEditMessage.fulfilled, (state) => {
       state.status = ConversationChatStatus.IDLE;
+      state.inputMessage = "";
+      state.editingMessageId = undefined;
     });
     builder.addCase(onEditMessage.pending, (state) => {
       state.status = ConversationChatStatus.EDITING_MESSAGE;

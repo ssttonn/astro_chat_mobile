@@ -47,7 +47,10 @@ const listenToSocketEvents = (conversationId: string, currentUser: IUser) => {
       dispatch(conversationMessagesActions.updateMessage(message));
     });
 
-    SocketIOClient.on("conversation/messageDeleted", (messageId: string) => {});
+    SocketIOClient.on("conversation/messageDeleted", (message: IMessage) => {
+      console.log("Message deleted", message);
+      dispatch(conversationMessagesActions.updateMessage(message));
+    });
   };
 };
 
@@ -85,9 +88,11 @@ const conversationRoomSlice = createSlice({
     setConversation: (state, action: PayloadAction<IConversation>) => {
       state.conversation = action.payload;
     },
-
     reset: (state) => {
-      state = initialState;
+      state.conversation = undefined;
+      state.status = ConversationRoomStatus.IDLE;
+      state.errorMessage = "";
+      state.typingUserIds = [];
     },
   },
   extraReducers: (builder) => {
