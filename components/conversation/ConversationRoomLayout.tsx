@@ -19,6 +19,7 @@ import MainTextField from "../common/MainTextField";
 import MessageItem from "./MessageItem";
 import IMessage from "@/business/data/models/IMessage";
 import { useActionSheet } from "@expo/react-native-action-sheet";
+import { debounce, throttle } from "@/business/helpers";
 
 enum MessageAction {
   edit,
@@ -152,11 +153,35 @@ const ConversationRoomLayout = ({
     [showActionSheetWithOptions, dispatch]
   );
 
+  const endTyping = useMemo(
+    () =>
+      debounce(() => {
+        if (!currentUser) return;
+        console.log("End typing");
+        conversationChatActions.onStopTyping(currentUser.id);
+      }, 500),
+    [currentUser]
+  );
+
+  const startTyping = useMemo(
+    () =>
+      throttle(() => {
+        if (!currentUser) return;
+        console.log("Start typing");
+        conversationChatActions.onStartTyping(currentUser.id);
+
+        endTyping();
+      }, 10000),
+    [currentUser, endTyping]
+  );
+
   const onChangeMessageInput = useCallback(
     (text: string) => {
       dispatch(conversationChatActions.setInputMessage(text));
+
+      startTyping();
     },
-    [dispatch]
+    [dispatch, startTyping]
   );
 
   const isSendButtonEnabled = useMemo(() => {

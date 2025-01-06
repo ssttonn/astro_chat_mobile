@@ -1,6 +1,8 @@
 import IMessage from "@/business/data/models/IMessage";
 import IUser from "@/business/data/models/IUser";
 import AxiosClient from "@/business/data/services/axiosClient";
+import { SocketIOClient } from "@/business/data/services/SocketIOClient";
+import { debounce, throttle } from "@/business/helpers";
 import { APIRoutes } from "@/constants/apiRoutes";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
@@ -138,6 +140,20 @@ const onDeleteMessage = createAsyncThunk<string | undefined, string>(
   }
 );
 
+const onStartTyping = (userId: string) => {
+  SocketIOClient.emit("conversation/userTyping", {
+    userId,
+    isTyping: true,
+  });
+};
+
+const onStopTyping = (userId: string) => {
+  SocketIOClient.emit("conversation/userTyping", {
+    userId,
+    isTyping: false,
+  });
+};
+
 const conversationChatSlice = createSlice({
   name: "conversationChat",
   initialState,
@@ -216,6 +232,8 @@ export const conversationChatActions = {
   onEditMessage,
   onDeleteMessage,
   onRetryToSendMessage,
+  onStartTyping,
+  onStopTyping,
   ...conversationChatSlice.actions,
 };
 

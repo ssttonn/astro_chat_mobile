@@ -7,6 +7,7 @@ import { APIRoutes } from "@/constants/apiRoutes";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppDispatch } from "../redux/store";
 import { conversationMessagesActions } from "./conversationMessagesReducer";
+import { conversationChatActions } from "./conversationChatReducer";
 
 export enum ConversationRoomStatus {
   IDLE = "idle",
@@ -51,6 +52,13 @@ const listenToSocketEvents = (conversationId: string, currentUser: IUser) => {
       console.log("Message deleted", message);
       dispatch(conversationMessagesActions.updateMessage(message));
     });
+
+    SocketIOClient.on(
+      "conversation/userTyping",
+      (payload: { userId: string; isTyping: boolean }) => {
+        dispatch(conversationChatActions.setUserIsTyping(payload));
+      }
+    );
   };
 };
 

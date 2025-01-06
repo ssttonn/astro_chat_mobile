@@ -14,7 +14,7 @@ const SplashScreen = () => {
     let timer = setTimeout(async () => {
       try {
         await getAccessToken();
-        router.replace(ScreenRoutes.home);
+        router.replace(ScreenRoutes.login);
       } catch (_) {
         router.replace(ScreenRoutes.login);
       }
